@@ -1,11 +1,12 @@
 import math
-from typing import Iterable, Union
+from typing import Iterable, List, Tuple, Union
 
+from .coordinate_axes import CoordinateAxes
 from .vector3 import Vector3
 
 
 class AABB:
-    """Axis Aligned Bounding Box."""
+    """An axis-aligned bounding box."""
 
     def __init__(self, min_corner: Vector3 = None, max_corner: Vector3 = None) -> None:
         self.min = min_corner or Vector3(math.inf, math.inf, math.inf)
@@ -13,7 +14,7 @@ class AABB:
 
     @classmethod
     def from_points(cls, points: Iterable[Vector3]) -> "AABB":
-        """Construct an AABB from a list of Vector3 points."""
+        """Construct a bounding box that bounds a list of points."""
         aabb = cls()
         aabb.expand(points)
 
@@ -21,21 +22,19 @@ class AABB:
 
     @classmethod
     def from_aabbs(cls, aabbs: Iterable["AABB"]) -> "AABB":
-        """Construct an AABB from a list of other AABBs."""
+        """Construct a bounding box that bounds a list of other bounding boxes."""
         aabb = cls()
         aabb.expand(aabbs)
 
         return aabb
 
     def expand(self, objects: Iterable[Union[Vector3, "AABB"]]) -> None:
-        """Expand the bounding box to include the passed objects."""
+        """Expand the bounding box to include the passed points and bounding boxes."""
         # If the passed parameter looks iterable, try to break it up recursively
         if isinstance(objects, (list, tuple)):
             for obj in objects:
                 self.expand(obj)
-            return None
-
-        if isinstance(objects, AABB):
+        elif isinstance(objects, AABB):
             # Expand the bounding box with the corner points
             self.expand([objects.min, objects.max])
         elif isinstance(objects, Vector3):
@@ -46,15 +45,16 @@ class AABB:
             raise TypeError("Unexpected type passed to AABB.expand()")
 
     def contains(self, point: Vector3) -> bool:
-        """Return True if the AABB contains the point."""
+        """Return True if the bounding box contains the point."""
         return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
 
     def sphere_radius(self) -> float:
-        """Create a bounding sphere for the AABB and return its radius."""
+        """Return the radius of a bounding sphere which contains the bounding box."""
         return max([(self.center - corner).length() for corner in self.corners])
 
-    def intersect(self, ray, min_t=0, max_t=math.inf):
-        t = [min_t, max_t]
+    def intersect(self, ray, min_t: float = 0, max_t: float = math.inf) -> bool:
+        """Return True if the provided ray intersects the bounding box."""
+        t_intersection = [min_t, max_t]
 
         # Check bounding slab intersections per component (x, y, z)
         for minimum, maximum, origin, direction in zip(
@@ -72,22 +72,25 @@ class AABB:
             if t_min > t_max:
                 t_min, t_max = t_max, t_min
 
-            if t_min > t[0]:
-                t[0] = t_min
-            if t_max < t[1]:
-                t[1] = t_max
+            if t_min > t_intersection[0]:
+                t_intersection[0] = t_min
+            if t_max < t_intersection[1]:
+                t_intersection[1] = t_max
 
-            if t[0] > t[1]:
+            if t_intersection[0] > t_intersection[1]:
                 return False
 
         return True
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return the string representation of the minimum and maximum corner points."""
         return f"Min: {self.min}, Max: {self.max}"
 
-    def split(self, axis, value):
-        # TODO: Instead of passing an integer into axis, consider an Enum maybe.
+    def split(self, axis: CoordinateAxes, value: float) -> Tuple["AABB", "AABB"]:
+        """Return two new child bounding boxes from splitting the existing bounding box.
 
+        Note that this function does not alter the existing bounding box.
+        """
         # TODO: Handle the case where value is outside the bounding box
         #   Maybe an exception?
 
@@ -105,6 +108,8 @@ class AABB:
 
     @property
     def is_empty(self) -> bool:
+        """Return True if the bounding box is infinite."""
+        # TODO: This function should really be renamed.
         # It's enough to check that one component is infinite to determine
         # that all of them are (assuming that the AABB is only manipulated
         # by calls to AABB.expand)
@@ -118,18 +123,21 @@ class AABB:
         return True
 
     @property
-    def center(self):
+    def center(self) -> Vector3:
+        """Return the center point of the bounding box."""
         if self.is_empty:
             return Vector3(0, 0, 0)
 
         return self.min + (self.size / 2)
 
     @property
-    def size(self):
+    def size(self) -> Vector3:
+        """Return the bounding box size for each coordinate axis."""
         return self.max - self.min
 
     @property
-    def corners(self):
+    def corners(self) -> List[Vector3]:
+        """Return all eight corner points of the bounding box."""
         size = self.size
         x = Vector3(x=size.x)
         y = Vector3(y=size.y)

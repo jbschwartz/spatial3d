@@ -1,4 +1,5 @@
 from .aabb import AABB
+from .coordinate_axes import CoordinateAxes
 from .dual import Dual
 from .facet import Facet
 from .intersection import Intersection
