@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from robot.spatial import Quaternion, Vector3, quaternion
+from spatial import Quaternion, Vector3, quaternion
 
 conjugate = quaternion.conjugate
 

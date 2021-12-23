@@ -1,8 +1,8 @@
 import math
 import unittest
 
-from robot.spatial import Quaternion, Transform, Vector3
-from robot.spatial.euler import Axes, Order
+from spatial import Quaternion, Transform, Vector3
+from spatial.euler import Axes, Order
 
 
 class TestTransform(unittest.TestCase):

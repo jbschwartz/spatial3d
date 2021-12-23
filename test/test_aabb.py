@@ -1,6 +1,6 @@
 import unittest
 
-from robot.spatial import AABB, Ray, Vector3
+from spatial import AABB, Ray, Vector3
 
 
 class TestAABB(unittest.TestCase):

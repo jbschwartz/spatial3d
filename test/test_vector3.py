@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from robot.spatial.vector3 import Vector3, angle_between, normalize
+from spatial.vector3 import Vector3, angle_between, normalize
 
 
 class TestVector3(unittest.TestCase):

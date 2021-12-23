@@ -1,6 +1,6 @@
 import unittest
 
-from robot.spatial import Facet, Intersection, Ray, Vector3
+from spatial import Facet, Intersection, Ray, Vector3
 
 
 class TestFacet(unittest.TestCase):

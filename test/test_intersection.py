@@ -1,6 +1,6 @@
 import unittest
 
-from robot.spatial import Intersection
+from spatial import Intersection
 
 
 class TestIntersection(unittest.TestCase):

@@ -2,7 +2,7 @@ import math
 import unittest
 from operator import itemgetter
 
-from robot.spatial import Quaternion, euler
+from spatial import Quaternion, euler
 
 
 class TestEuler(unittest.TestCase):

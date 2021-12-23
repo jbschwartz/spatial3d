@@ -1,5 +1,2 @@
-from robot.exceptions import RobotError
-
-
-class DegenerateTriangleError:
+class DegenerateTriangleError(Exception):
     pass

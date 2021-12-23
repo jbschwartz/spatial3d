@@ -1,5 +1,3 @@
-import numpy as np
-
 from .aabb import AABB
 from .intersection import Intersection
 from .kdtree import KDTree
@@ -35,20 +33,6 @@ class Mesh:
     @accelerator.setter
     def accelerator(self, accelerator):
         self._accelerator = accelerator(self)
-
-    def get_buffer_data(self, index: int = 0) -> np.array:
-        """Return a numpy array of flattened, interleaved vertex position and normal floats.
-
-        Index is useful for storing multiple meshes in a single OpenGL buffer.
-        This allows the shader program to distinguish between meshes.
-        """
-        data = [
-            ([*vertex, *(facet.normal)], index)
-            for facet in self.facets
-            for vertex in facet.vertices
-        ]
-
-        return np.array(data, dtype=[("", np.float32, 6), ("", np.int32)])
 
     def transform(self, transform: "Transform") -> "Mesh":
         transformed_facets = [f.transform(transform) for f in self.facets]

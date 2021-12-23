@@ -1,4 +1,4 @@
-from robot.spatial import quaternion
+from . import quaternion
 
 Quaternion = quaternion.Quaternion
 

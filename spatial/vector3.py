@@ -2,8 +2,6 @@ import math
 from numbers import Number
 from typing import Union
 
-from robot import utils
-
 from .swizzler import Swizzler
 
 VECTOR_X = 0
@@ -122,7 +120,7 @@ def angle_between(v1: Vector3, v2: Vector3) -> float:
     dot = v1 * v2
     lengths = v1.length() * v2.length()
 
-    return utils.safe_acos(dot / lengths)
+    return math.acos(dot / lengths)
 
 
 def normalize(v: Vector3) -> Vector3:

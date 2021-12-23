@@ -1,6 +1,6 @@
 import unittest
 
-from robot.spatial import Dual, Quaternion
+from spatial import Dual, Quaternion
 
 
 class TestDual(unittest.TestCase):
