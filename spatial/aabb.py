@@ -28,6 +28,61 @@ class AABB:
 
         return aabb
 
+    def __str__(self) -> str:
+        """Return the string representation of the minimum and maximum corner points."""
+        return f"Min: {self.min}, Max: {self.max}"
+
+    @property
+    def center(self) -> Vector3:
+        """Return the center point of the bounding box."""
+        if self.is_empty:
+            return Vector3(0, 0, 0)
+
+        return self.min + (self.size / 2)
+
+    @property
+    def corners(self) -> List[Vector3]:
+        """Return all eight corner points of the bounding box."""
+        size = self.size
+        x = Vector3(x=size.x)
+        y = Vector3(y=size.y)
+
+        return [
+            self.max,
+            self.max - x,
+            self.max - x - y,
+            self.max - y,
+            self.min,
+            self.min + x,
+            self.min + x + y,
+            self.min + y,
+        ]
+
+    @property
+    def is_empty(self) -> bool:
+        """Return True if the bounding box is infinite."""
+        # TODO: This function should really be renamed.
+        # It's enough to check that one component is infinite to determine
+        # that all of them are (assuming that the AABB is only manipulated
+        # by calls to AABB.expand)
+        if not math.isinf(self.min[0]):
+            return False
+
+        assert all(
+            [math.isinf(c) for v in (self.min, self.max) for c in v]
+        ), "If one AABB component is infinite, all components should be infinite"
+
+        return True
+
+    @property
+    def size(self) -> Vector3:
+        """Return the bounding box size for each coordinate axis."""
+        return self.max - self.min
+
+    def contains(self, point: Vector3) -> bool:
+        """Return True if the bounding box contains the point."""
+        return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
+
     def expand(self, objects: Iterable[Union[Vector3, "AABB"]]) -> None:
         """Expand the bounding box to include the passed points and bounding boxes."""
         # If the passed parameter looks iterable, try to break it up recursively
@@ -43,14 +98,6 @@ class AABB:
                 self.max[index] = max(value, self.max[index])
         else:
             raise TypeError("Unexpected type passed to AABB.expand()")
-
-    def contains(self, point: Vector3) -> bool:
-        """Return True if the bounding box contains the point."""
-        return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
-
-    def sphere_radius(self) -> float:
-        """Return the radius of a bounding sphere which contains the bounding box."""
-        return max([(self.center - corner).length() for corner in self.corners])
 
     def intersect(self, ray, min_t: float = 0, max_t: float = math.inf) -> bool:
         """Return True if the provided ray intersects the bounding box."""
@@ -82,9 +129,9 @@ class AABB:
 
         return True
 
-    def __str__(self) -> str:
-        """Return the string representation of the minimum and maximum corner points."""
-        return f"Min: {self.min}, Max: {self.max}"
+    def sphere_radius(self) -> float:
+        """Return the radius of a bounding sphere which contains the bounding box."""
+        return max([(self.center - corner).length() for corner in self.corners])
 
     def split(self, axis: CoordinateAxes, value: float) -> Tuple["AABB", "AABB"]:
         """Return two new child bounding boxes from splitting the existing bounding box.
@@ -105,50 +152,3 @@ class AABB:
         right = AABB(right_min, self.max)
 
         return left, right
-
-    @property
-    def is_empty(self) -> bool:
-        """Return True if the bounding box is infinite."""
-        # TODO: This function should really be renamed.
-        # It's enough to check that one component is infinite to determine
-        # that all of them are (assuming that the AABB is only manipulated
-        # by calls to AABB.expand)
-        if not math.isinf(self.min[0]):
-            return False
-
-        assert all(
-            [math.isinf(c) for v in (self.min, self.max) for c in v]
-        ), "If one AABB component is infinite, all components should be infinite"
-
-        return True
-
-    @property
-    def center(self) -> Vector3:
-        """Return the center point of the bounding box."""
-        if self.is_empty:
-            return Vector3(0, 0, 0)
-
-        return self.min + (self.size / 2)
-
-    @property
-    def size(self) -> Vector3:
-        """Return the bounding box size for each coordinate axis."""
-        return self.max - self.min
-
-    @property
-    def corners(self) -> List[Vector3]:
-        """Return all eight corner points of the bounding box."""
-        size = self.size
-        x = Vector3(x=size.x)
-        y = Vector3(y=size.y)
-
-        return [
-            self.max,
-            self.max - x,
-            self.max - x - y,
-            self.max - y,
-            self.min,
-            self.min + x,
-            self.min + x + y,
-            self.min + y,
-        ]
