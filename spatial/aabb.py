@@ -1,47 +1,41 @@
 import math
-from typing import Iterable, List, Tuple, Union
+from functools import cached_property
+from typing import Iterable, Optional, Tuple, Union
 
 from .coordinate_axes import CoordinateAxes
 from .vector3 import Vector3
+
+Boundable = Union[Vector3, "AABB", Iterable[Vector3], Iterable["AABB"]]
 
 
 class AABB:
     """An axis-aligned bounding box."""
 
-    def __init__(self, min_corner: Vector3 = None, max_corner: Vector3 = None) -> None:
-        self.min = min_corner or Vector3(math.inf, math.inf, math.inf)
-        self.max = max_corner or -Vector3(math.inf, math.inf, math.inf)
+    def __init__(self, objects: Optional[Boundable] = None) -> None:
+        """Construct a bounding box that bounds a list of points or other bounding boxes."""
+        self.min = Vector3(math.inf, math.inf, math.inf)
+        self.max = -Vector3(math.inf, math.inf, math.inf)
 
-    @classmethod
-    def from_points(cls, points: Iterable[Vector3]) -> "AABB":
-        """Construct a bounding box that bounds a list of points."""
-        aabb = cls()
-        aabb.expand(points)
-
-        return aabb
-
-    @classmethod
-    def from_aabbs(cls, aabbs: Iterable["AABB"]) -> "AABB":
-        """Construct a bounding box that bounds a list of other bounding boxes."""
-        aabb = cls()
-        aabb.expand(aabbs)
-
-        return aabb
+        if objects is not None:
+            self.expand(objects)
 
     def __str__(self) -> str:
         """Return the string representation of the minimum and maximum corner points."""
         return f"Min: {self.min}, Max: {self.max}"
 
-    @property
+    @cached_property
     def center(self) -> Vector3:
         """Return the center point of the bounding box."""
-        if self.is_empty:
+
+        # It's enough to check that one component is infinite to determine that all of them are
+        # (assuming that the AABB is only manipulated by calls to AABB.expand)
+        if math.isinf(self.min[0]):
             return Vector3(0, 0, 0)
 
         return self.min + (self.size / 2)
 
-    @property
-    def corners(self) -> List[Vector3]:
+    @cached_property
+    def corners(self) -> list[Vector3]:
         """Return all eight corner points of the bounding box."""
         size = self.size
         x = Vector3(x=size.x)
@@ -59,31 +53,22 @@ class AABB:
         ]
 
     @property
-    def is_empty(self) -> bool:
-        """Return True if the bounding box is infinite."""
-        # TODO: This function should really be renamed.
-        # It's enough to check that one component is infinite to determine
-        # that all of them are (assuming that the AABB is only manipulated
-        # by calls to AABB.expand)
-        if not math.isinf(self.min[0]):
-            return False
-
-        assert all(
-            [math.isinf(c) for v in (self.min, self.max) for c in v]
-        ), "If one AABB component is infinite, all components should be infinite"
-
-        return True
-
-    @property
     def size(self) -> Vector3:
         """Return the bounding box size for each coordinate axis."""
+        if math.isinf(self.min[0]):
+            return self.min
+
         return self.max - self.min
+
+    def axis_extents(self, axis: CoordinateAxes) -> Tuple[float, float]:
+        """Return the minimum and maximum values for the given axis."""
+        return (self.min[axis], self.max[axis])
 
     def contains(self, point: Vector3) -> bool:
         """Return True if the bounding box contains the point."""
         return all(low <= value <= high for low, value, high in zip(self.min, point, self.max))
 
-    def expand(self, objects: Iterable[Union[Vector3, "AABB"]]) -> None:
+    def expand(self, objects: Boundable) -> None:
         """Expand the bounding box to include the passed points and bounding boxes."""
         # If the passed parameter looks iterable, try to break it up recursively
         if isinstance(objects, (list, tuple)):
@@ -93,11 +78,18 @@ class AABB:
             # Expand the bounding box with the corner points
             self.expand([objects.min, objects.max])
         elif isinstance(objects, Vector3):
-            for index, value in enumerate(objects):
-                self.min[index] = min(value, self.min[index])
-                self.max[index] = max(value, self.max[index])
+            for coordinate, value in enumerate(objects):
+                self.min[coordinate] = min(value, self.min[coordinate])
+                self.max[coordinate] = max(value, self.max[coordinate])
+
+            # Invalidate the cached properties.
+            if self.corners is not None:
+                del self.corners
+
+            if self.center is not None:
+                del self.center
         else:
-            raise TypeError("Unexpected type passed to AABB.expand()")
+            raise TypeError(f"Unexpected type passed to AABB.expand: {type(objects)}")
 
     def intersect(self, ray, min_t: float = 0, max_t: float = math.inf) -> bool:
         """Return True if the provided ray intersects the bounding box."""
@@ -136,19 +128,24 @@ class AABB:
     def split(self, axis: CoordinateAxes, value: float) -> Tuple["AABB", "AABB"]:
         """Return two new child bounding boxes from splitting the existing bounding box.
 
+        Raises ValueError if the split value is outside the bounds of the bounding box.
+
         Note that this function does not alter the existing bounding box.
         """
-        # TODO: Handle the case where value is outside the bounding box
-        #   Maybe an exception?
+        if self.min[axis] >= value or self.max[axis] <= value:
+            raise ValueError(
+                f"The split plane ({value}) is outside of the bounding box: "
+                "({self.min[axis]} , {self.max[axis]})"
+            )
 
         left_max = Vector3(*self.max)
         left_max[axis] = value
 
-        left = AABB(self.min, left_max)
+        left = AABB([self.min, left_max])
 
         right_min = Vector3(*self.min)
         right_min[axis] = value
 
-        right = AABB(right_min, self.max)
+        right = AABB([right_min, self.max])
 
         return left, right
