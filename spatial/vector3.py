@@ -7,6 +7,8 @@ from .swizzler import Swizzler
 class Vector3(Swizzler):
     """A 3D Vector."""
 
+    __slots__ = ["x", "y", "z"]
+
     def __init__(self, x: float = 0, y: float = 0, z: float = 0) -> None:
         self.x = x
         self.y = y
