@@ -26,8 +26,10 @@ profile = "black"
 
 [tool.pydocstyle]
 match='(?!test_).*\.py'
-ignore = "D100, D203"
+# Turn off module (D100) and __init__ (D107) docstrings.
+# Ignore blank line before class docstring (D203) and docstrings start on the first line (D213).
+ignore = "D100, D107, D213, D203"
 
 [tool.pylint.'MESSAGES CONTROL']
-disable = "C0114"
-good-names = "x,y,z"
+# Turn off checking of invalid names (C0103), module docstrings (C0114), and TODO comments (W0511).
+disable = "C0103, C0114, W0511"
