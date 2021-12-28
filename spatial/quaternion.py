@@ -7,6 +7,7 @@ from .swizzler import Swizzler
 class Quaternion(Swizzler):
     """Quaternion of the form r + xi + yj + zk."""
 
+    __slots__ = ["r", "x", "y", "z"]
     def __init__(self, r=1, x=0, y=0, z=0):
         """Construct a quaternion from four components."""
         self.r = r
