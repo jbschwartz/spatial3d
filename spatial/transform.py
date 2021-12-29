@@ -11,12 +11,13 @@ class Transform:
     """Spatial rigid body transformation in three dimensions."""
 
     def __init__(self, d: Dual = None) -> None:
+        # Default to the identity transformation (i.e., a transform that does not transform).
         self.dual = d or Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0))
 
     @classmethod
     def Identity(cls) -> "Transform":
-        """Construct an identity transform (i.e., a transform that does not transform)."""
-        return cls(Dual(Quaternion(1, 0, 0, 0), Quaternion(0, 0, 0, 0)))
+        """Alias to construct an identity transform."""
+        return cls()
 
     @classmethod
     def from_axis_angle_translation(
@@ -36,7 +37,7 @@ class Transform:
     ) -> "Transform":
         """Create a transform from orientation and translation."""
         translation = translation or Vector3()
-        return cls(Dual(orientation, 0.5 * Quaternion(0, *translation) * orientation))
+        return cls(Dual(orientation, 0.5 * Quaternion.from_vector(translation) * orientation))
 
     def __call__(
         self, vector: Union[Iterable[Vector3], Vector3], as_type: str = "point"
@@ -46,7 +47,7 @@ class Transform:
             return [self.__call__(item, as_type) for item in vector]
 
         if not isinstance(vector, Vector3):
-            raise NotImplementedError
+            return NotImplemented
 
         return self.transform(vector, as_type)
 
@@ -63,30 +64,28 @@ class Transform:
         """Return a the inverse of this transform."""
         return Transform(Dual(quaternion.conjugate(self.dual.r), quaternion.conjugate(self.dual.d)))
 
-    def transform(self, vector: Vector3, as_type: str) -> Vector3:
+    def transform(self, vector: Vector3, as_type: str = "point") -> Vector3:
         """Apply the transform to the provided vector.
 
         Optionally treat the vector as a point and apply to its position.
         """
-        q = Quaternion(0, *vector.xyz)
+        q = Quaternion.from_vector(vector)
         if as_type == "vector":
-            d = Dual(q, Quaternion(0, 0, 0, 0))
-            a = self.dual * d * dual.conjugate(self.dual)
-            return Vector3(*a.r.xyz)
+            return self.dual.r.rotate(vector)
 
         if as_type == "point":
             d = Dual(Quaternion(), q)
             a = self.dual * d * dual.conjugate(self.dual)
-            return Vector3(*a.d.xyz)
+            return a.d.vector
 
-        raise KeyError
+        raise KeyError(f"Unknown transform type: {as_type}")
 
     # TODO: Make me a property
     def translation(self) -> Vector3:
         """Return the transform's translation vector."""
         # "Undo" what was done in the __init__ function by working backwards
         t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
-        return Vector3(*t.xyz)
+        return t.vector
 
     # TODO: Make me a property
     def rotation(self) -> Quaternion:
