@@ -42,26 +42,29 @@ class Quaternion(Swizzler):
         """Return a quaternion with the component-wise absolute values of this quaternion."""
         return Quaternion(abs(self.r), abs(self.x), abs(self.y), abs(self.z))
 
-    def __round__(self, places: int = 0) -> "Quaternion":
-        """Return a quaternion with the component-wise rounded values of this quaternion."""
-        return Quaternion(
-            round(self.r, places),
-            round(self.x, places),
-            round(self.y, places),
-            round(self.z, places),
-        )
-
     def __add__(self, other: "Quaternion") -> "Quaternion":
         """Return a quaternion with the component-wise sum of this quaternion and the other."""
         return Quaternion(self.r + other.r, self.x + other.x, self.y + other.y, self.z + other.z)
 
-    def __sub__(self, other) -> "Quaternion":
-        """Return a quaternion with the component-wise difference of this and the other."""
-        return Quaternion(self.r - other.r, self.x - other.x, self.y - other.y, self.z - other.z)
+    def __eq__(self, other: object) -> bool:
+        """Return True if this quaternion is equal to the other."""
+        if isinstance(other, Quaternion):
+            return (
+                self.r == other.r and self.x == other.x and self.y == other.y and self.z == other.z
+            )
 
-    def __neg__(self) -> "Quaternion":
-        """Return a quaternion with the component-wise negation of this quaternion."""
-        return Quaternion(-self.r, -self.x, -self.y, -self.z)
+        if isinstance(other, int):
+            if other == 0:
+                # Used to check Quaternion == 0 (i.e. check if Quaternion is the zero Quaternion)
+                # This is useful for unittest.assertAlmostEqual
+                return self.r == 0 and self.x == 0 and self.y == 0 and self.z == 0
+
+        return NotImplemented
+
+    def __getitem__(self, index: int) -> float:
+        """Return the value of the component at the provided index."""
+        components = ["r", "x", "y", "z"]
+        return getattr(self, components[index])
 
     def __mul__(self, other: Union[float, int, "Quaternion"]) -> "Quaternion":
         """Quaternion multiplication.
@@ -82,7 +85,28 @@ class Quaternion(Swizzler):
 
         return NotImplemented
 
+    def __neg__(self) -> "Quaternion":
+        """Return a quaternion with the component-wise negation of this quaternion."""
+        return Quaternion(-self.r, -self.x, -self.y, -self.z)
+
     __rmul__ = __mul__
+
+    def __round__(self, places: int = 0) -> "Quaternion":
+        """Return a quaternion with the component-wise rounded values of this quaternion."""
+        return Quaternion(
+            round(self.r, places),
+            round(self.x, places),
+            round(self.y, places),
+            round(self.z, places),
+        )
+
+    def __str__(self) -> str:
+        """Return the string representation of this quaternion."""
+        return f"({self.r}, {self.x}, {self.y}, {self.z})"
+
+    def __sub__(self, other: "Quaternion") -> "Quaternion":
+        """Return a quaternion with the component-wise difference of this and the other."""
+        return Quaternion(self.r - other.r, self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __truediv__(self, other: Union[float, int]) -> "Quaternion":
         """Return a quaternion with the component-wise scalar quotient of this quaternion."""
@@ -91,30 +115,6 @@ class Quaternion(Swizzler):
             return reciprocal * self
 
         return NotImplemented
-
-    def __eq__(self, other: object) -> bool:
-        """Return True if this quaternion is equal to the other."""
-        if isinstance(other, Quaternion):
-            return (
-                self.r == other.r and self.x == other.x and self.y == other.y and self.z == other.z
-            )
-
-        if isinstance(other, int):
-            if other == 0:
-                # Used to check Quaternion == 0 (i.e. check if Quaternion is the zero vector)
-                # This is useful for unittest.assertAlmostEqual
-                return self.r == 0 and self.x == 0 and self.y == 0 and self.z == 0
-
-        return NotImplemented
-
-    def __str__(self) -> str:
-        """Return the string representation of this quaternion."""
-        return f"({self.r}, {self.x}, {self.y}, {self.z})"
-
-    def __getitem__(self, index: int) -> float:
-        """Return the value of the component at the provided index."""
-        components = ["r", "x", "y", "z"]
-        return getattr(self, components[index])
 
     def conjugate(self) -> None:
         """Conjugates the quaternion instance."""
