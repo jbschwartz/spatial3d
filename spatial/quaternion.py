@@ -44,7 +44,12 @@ class Quaternion(Swizzler):
 
     def __add__(self, other: "Quaternion") -> "Quaternion":
         """Return a quaternion with the component-wise sum of this quaternion and the other."""
-        return Quaternion(self.r + other.r, self.x + other.x, self.y + other.y, self.z + other.z)
+        if isinstance(other, Quaternion):
+            return Quaternion(
+                self.r + other.r, self.x + other.x, self.y + other.y, self.z + other.z
+            )
+
+        return NotImplemented
 
     def __eq__(self, other: object) -> bool:
         """Return True if this quaternion is equal to the other."""
@@ -100,13 +105,23 @@ class Quaternion(Swizzler):
             round(self.z, places),
         )
 
+    def __setitem__(self, index: int, value: float) -> None:
+        """Set the value of the component at the provided index."""
+        components = ["r", "x", "y", "z"]
+        setattr(self, components[index], value)
+
     def __str__(self) -> str:
         """Return the string representation of this quaternion."""
         return f"({self.r}, {self.x}, {self.y}, {self.z})"
 
     def __sub__(self, other: "Quaternion") -> "Quaternion":
         """Return a quaternion with the component-wise difference of this and the other."""
-        return Quaternion(self.r - other.r, self.x - other.x, self.y - other.y, self.z - other.z)
+        if isinstance(other, Quaternion):
+            return Quaternion(
+                self.r - other.r, self.x - other.x, self.y - other.y, self.z - other.z
+            )
+
+        return NotImplemented
 
     def __truediv__(self, other: Union[float, int]) -> "Quaternion":
         """Return a quaternion with the component-wise scalar quotient of this quaternion."""
