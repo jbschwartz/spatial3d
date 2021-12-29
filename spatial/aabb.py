@@ -26,7 +26,6 @@ class AABB:
     @cached_property
     def center(self) -> Vector3:
         """Return the center point of the bounding box."""
-
         # It's enough to check that one component is infinite to determine that all of them are
         # (assuming that the AABB is only manipulated by calls to AABB.expand)
         if math.isinf(self.min[0]):
