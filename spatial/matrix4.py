@@ -31,6 +31,8 @@ class Matrix4:
     @classmethod
     def from_dual(cls, dual: Dual[Quaternion]) -> "Matrix4":
         """Construct a matrix from a dual quaternion."""
+        assert isinstance(dual.r, Quaternion) and isinstance(dual.d, Quaternion)
+
         elements = []
 
         r_star = conjugate(dual.r)
@@ -42,6 +44,10 @@ class Matrix4:
         elements.extend([*translation.xyz, 1])
 
         return cls(elements)
+
+    def __getitem__(self, index: int) -> float:
+        """Return the value of the matrix at the provided index."""
+        return self.elements[index]
 
     def __str__(self) -> str:
         """Return the string representation of this matrix."""
