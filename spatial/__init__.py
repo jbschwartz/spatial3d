@@ -1,6 +1,7 @@
 from .aabb import AABB
 from .coordinate_axes import CoordinateAxes
 from .dual import Dual
+from .edge import Edge
 from .facet import Facet
 from .intersection import Intersection
 from .kdtree import KDTree
