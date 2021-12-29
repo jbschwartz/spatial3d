@@ -94,11 +94,11 @@ class TestTransform(unittest.TestCase):
 
     def test_translation(self):
         expected = Vector3(4, 2, 6)
-        self.assertEqual(self.pureTranslate.translation(), expected)
+        self.assertEqual(self.pureTranslate.translation, expected)
 
     def test_rotation(self):
         expected = self.pureRotate.dual.r
-        self.assertEqual(self.pureRotate.rotation(), expected)
+        self.assertEqual(self.pureRotate.rotation, expected)
 
     def test_inverse(self):
         expected = self.point
