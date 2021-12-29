@@ -133,7 +133,6 @@ class Quaternion(Swizzler):
 
     def conjugate(self) -> None:
         """Conjugates the quaternion instance."""
-
         self.x = -self.x
         self.y = -self.y
         self.z = -self.z
@@ -144,7 +143,7 @@ class Quaternion(Swizzler):
         return math.sqrt(self.r ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2)
 
     def normalize(self) -> None:
-        """Normalizes the quaternion instance (i.e. norm of one)."""
+        """Normalize the quaternion instance (i.e. norm of one)."""
         norm = self.norm()
         self.r /= norm
         self.x /= norm
