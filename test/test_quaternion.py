@@ -35,6 +35,10 @@ class TestQuaternion(unittest.TestCase):
         actual = Quaternion.from_euler([angle, angle, 0], Axes.ZYZ, Order.INTRINSIC)
         self.assertAlmostEqual(actual, z * y)
 
+    def test_from_vector_constructs_a_quaternion_from_a_vector(self) -> None:
+        v = Vector3(1, -2, 3)
+        self.assertEqual(Quaternion.from_vector(v), Quaternion(0, *v))
+
     def test__abs__returns_the_absolute_values(self) -> None:
         self.assertEqual(abs(self.r), Quaternion(4, 3, 2, 1))
 
@@ -114,6 +118,9 @@ class TestQuaternion(unittest.TestCase):
     def test__truediv__returns_notimplemented_for_incompatible_types(self) -> None:
         self.assertTrue(self.q.__truediv__("string") == NotImplemented)
 
+    def test_vector_returns_the_vector_component_of_the_quaternion(self) -> None:
+        self.assertEqual(self.q.vector, Vector3(2, 3, 4))
+
     def test_conjugate_conjugates_the_quaternion(self) -> None:
         expected = Quaternion(self.q.r, -self.q.x, -self.q.y, -self.q.z)
         self.q.conjugate()
@@ -129,6 +136,10 @@ class TestQuaternion(unittest.TestCase):
 
         self.assertAlmostEqual(self.q, expected)
         self.assertAlmostEqual(self.q.norm(), 1)
+
+    def test_rotate_returns_a_rotated_vector(self) -> None:
+        q = Quaternion.from_axis_angle(Vector3.X(), math.radians(90))
+        self.assertAlmostEqual(q.rotate(Vector3(1, 0, 1)), Vector3(1, -1, 0))
 
     def test_quaternion_conjugate_returns_the_conjugate(self) -> None:
         result = quaternion.conjugate(self.q)

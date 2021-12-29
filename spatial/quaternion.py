@@ -38,6 +38,11 @@ class Quaternion(Swizzler):
 
         return quaternion
 
+    @classmethod
+    def from_vector(cls, vector: Vector3) -> "Quaternion":
+        """Construct a quaternion from a vector."""
+        return cls(0, *vector)
+
     def __abs__(self) -> "Quaternion":
         """Return a quaternion with the component-wise absolute values of this quaternion."""
         return Quaternion(abs(self.r), abs(self.x), abs(self.y), abs(self.z))
@@ -131,6 +136,11 @@ class Quaternion(Swizzler):
 
         return NotImplemented
 
+    @property
+    def vector(self) -> Vector3:
+        """Return the vector component of this quaternion."""
+        return Vector3(self.x, self.y, self.z)
+
     def conjugate(self) -> None:
         """Conjugates the quaternion instance."""
         self.x = -self.x
@@ -149,6 +159,11 @@ class Quaternion(Swizzler):
         self.x /= norm
         self.y /= norm
         self.z /= norm
+
+    def rotate(self, vector: Vector3) -> Vector3:
+        """Return the provided vector rotated by this quaternion."""
+        result = self * Quaternion.from_vector(vector) * conjugate(self)
+        return Vector3(*result.xyz)
 
 
 def conjugate(q: Quaternion) -> Quaternion:

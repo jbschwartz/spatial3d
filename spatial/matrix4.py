@@ -35,12 +35,10 @@ class Matrix4:
 
         elements = []
 
-        r_star = conjugate(dual.r)
         for basis in [Vector3.X(), Vector3.Y(), Vector3.Z()]:
-            transformed_basis = dual.r * Quaternion(0, *basis) * r_star
-            elements.extend([*transformed_basis.xyz, 0])
+            elements.extend([*dual.r.rotate(basis), 0])
 
-        translation = 2 * dual.d * r_star
+        translation = 2 * dual.d * conjugate(dual.r)
         elements.extend([*translation.xyz, 1])
 
         return cls(elements)
