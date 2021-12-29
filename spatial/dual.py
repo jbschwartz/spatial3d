@@ -13,16 +13,28 @@ class Dual(Generic[T]):
         self.d: T = d
 
     def __abs__(self) -> "Dual":
+        """Return a dual with the component-wise absolute values of this dual."""
         return Dual(abs(self.r), abs(self.d))
 
-    def __round__(self, places: int) -> "Dual":
-        return Dual(round(self.r, places), round(self.d, places))
-
     def __add__(self, other: "Dual") -> "Dual":
-        return Dual(self.r + other.r, self.d + other.d)
+        """Return a dual with the component-wise sum of this dual and the other."""
+        if isinstance(other, Dual):
+            return Dual(self.r + other.r, self.d + other.d)
 
-    def __sub__(self, other: "Dual") -> "Dual":
-        return Dual(self.r - other.r, self.d - other.d)
+        return NotImplemented
+
+    def __eq__(self, other: object) -> bool:
+        """Return True if this dual is equal to the other."""
+        if isinstance(other, Dual):
+            return self.r == other.r and self.d == other.d
+
+        if isinstance(other, int):
+            if other == 0:
+                # Used to check Dual == 0 (i.e. check if Dual is the zero Dual)
+                # This is useful for unittest.assertAlmostEqual
+                return self.r == 0 and self.d == 0
+
+        return NotImplemented
 
     def __mul__(self, other: Union["Dual", float, int]) -> "Dual":
         """Dual multiplication.
@@ -38,29 +50,30 @@ class Dual(Generic[T]):
 
         return NotImplemented
 
+    def __round__(self, places: int = 0) -> "Dual":
+        """Return a dual with the component-wise rounded values of this dual."""
+        return Dual(round(self.r, places), round(self.d, places))
+
     __rmul__ = __mul__
 
+    def __str__(self) -> str:
+        """Return the string representation of this dual."""
+        return f"{self.r} + {self.d}" + "\u03B5"
+
+    def __sub__(self, other: "Dual") -> "Dual":
+        """Return a dual with the component-wise difference of this dual and the other."""
+        if isinstance(other, Dual):
+            return Dual(self.r - other.r, self.d - other.d)
+
+        return NotImplemented
+
     def __truediv__(self, other: Union[float, int]) -> "Dual":
+        """Return a dual with the component-wise scalar quotient of this dual."""
         if isinstance(other, (float, int)):
             reciprocal = 1 / other
             return reciprocal * self
 
         return NotImplemented
-
-    def __eq__(self, other) -> bool:
-        if isinstance(other, Dual):
-            return self.r == other.r and self.d == other.d
-
-        if isinstance(other, int):
-            if other == 0:
-                # Used to check Dual == 0 (i.e. check if Dual is the zero Dual)
-                # This is useful for unittest.assertAlmostEqual
-                return self.r == 0 and self.d == 0
-
-        return NotImplemented
-
-    def __str__(self) -> str:
-        return f"{self.r} + {self.d}" + "\u03B5"
 
     def conjugate(self) -> None:
         """Conjugates the dual instance."""
