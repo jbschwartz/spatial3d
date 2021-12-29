@@ -16,17 +16,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - uses: abatilo/actions-poetry@v2.1.4
-    - uses: actions/cache@v1
-      id: cache
-      with:
-          path: ~/.virtualenvs
-          key: poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: poetry-${{ hashFiles('**/poetry.lock') }}
-    - name: Set Poetry config
-      run: |
-          poetry config virtualenvs.in-project false
-          poetry config virtualenvs.path ~/.virtualenvs
-    - name: Install Dependencies
-      run: poetry install
-      if: steps.cache.outputs.cache-hit != 'true'
+    - run: poetry install
+    - run: poetry run pydocstyle ./spatial
+    - run: poetry run pylint ./spatial
+    - run: poetry run black --check .
     - run: python -m unittest
