@@ -60,6 +60,18 @@ class Transform:
 
     __rmul__ = __mul__
 
+    @property
+    def rotation(self) -> Quaternion:
+        """Return the transform's rotation quaternion."""
+        return self.dual.r
+
+    @property
+    def translation(self) -> Vector3:
+        """Return the transform's translation vector."""
+        # "Undo" what was done in the __init__ function by working backwards
+        t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
+        return t.vector
+
     def inverse(self) -> "Transform":
         """Return a the inverse of this transform."""
         return Transform(Dual(quaternion.conjugate(self.dual.r), quaternion.conjugate(self.dual.d)))
@@ -79,15 +91,3 @@ class Transform:
             return a.d.vector
 
         raise KeyError(f"Unknown transform type: {as_type}")
-
-    # TODO: Make me a property
-    def translation(self) -> Vector3:
-        """Return the transform's translation vector."""
-        # "Undo" what was done in the __init__ function by working backwards
-        t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
-        return t.vector
-
-    # TODO: Make me a property
-    def rotation(self) -> Quaternion:
-        """Return the transform's rotation quaternion."""
-        return self.dual.r
