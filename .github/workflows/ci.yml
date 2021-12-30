@@ -9,6 +9,7 @@ jobs:
       matrix:
         python-version: ['3.9', '3.10']
       max-parallel: 5
+      fail-fast: false
 
     steps:
     - uses: actions/checkout@v2
