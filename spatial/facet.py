@@ -39,18 +39,10 @@ class Facet:
 
         return edges
 
-    def transform(self, transform: Transform) -> "Facet":
-        """Return a facet transformed with the provided transform."""
-        transformed_normal = transform(self.normal, as_type="vector")
-        transformed_vertices = [transform(v, as_type="point") for v in self.vertices]
-
-        return Facet(transformed_vertices, transformed_normal)
-
-    def scale(self, scale: float = 1) -> "Facet":
-        """Return a facet scaled by the provided scale factor."""
-        transformed_vertices = [scale * v for v in self.vertices]
-
-        return Facet(transformed_vertices, self.computed_normal)
+    @property
+    def is_triangle(self) -> bool:
+        """Return true if the facet has three vertices."""
+        return len(self.vertices) == 3
 
     def append(self, vertex: Vector3, recompute: bool = True) -> None:
         """Add a vertex to the Facet.
@@ -67,10 +59,6 @@ class Facet:
             for attr in ["aabb", "computed_normal", "edges"]:
                 if getattr(self, attr) is not None:
                     delattr(self, attr)
-
-    def is_triangle(self) -> bool:
-        """Return True if the Facet has 3 vertices."""
-        return len(self.vertices) == 3
 
     def intersect(self, ray: Ray, check_back_facing: bool = False) -> Intersection:
         """Return the Intersection with parametric value of ray (or Intersection.Miss() for a miss).
@@ -109,3 +97,16 @@ class Facet:
         t = Q * E2 / det
 
         return Intersection(t, self)
+
+    def scale(self, scale: float = 1) -> "Facet":
+        """Return a facet scaled by the provided scale factor."""
+        transformed_vertices = [scale * v for v in self.vertices]
+
+        return Facet(transformed_vertices, self.computed_normal)
+
+    def transform(self, transform: Transform) -> "Facet":
+        """Return a facet transformed with the provided transform."""
+        transformed_normal = transform(self.normal, as_type="vector")
+        transformed_vertices = [transform(v, as_type="point") for v in self.vertices]
+
+        return Facet(transformed_vertices, transformed_normal)
