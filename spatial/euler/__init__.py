@@ -9,7 +9,7 @@ def angles(
 ) -> list[list[float]]:
     """Return the requested Euler angles and type from the provided quaternion."""
     if not isinstance(axes, Axes) or not isinstance(order, Order):
-        raise KeyError
+        raise TypeError("Unknown type passed to function")
 
     # Take advantage of extrinsic being the reverse axes order intrinsic solution reversed
     if order == Order.EXTRINSIC:
