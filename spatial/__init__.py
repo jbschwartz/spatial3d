@@ -4,7 +4,7 @@ from .dual import Dual
 from .edge import Edge
 from .facet import Facet
 from .intersection import Intersection
-from .kdtree import KDTree
+from .kdtree import KDTreeNode
 from .matrix4 import Matrix4
 from .mesh import Mesh
 from .quaternion import Quaternion
