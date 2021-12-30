@@ -93,6 +93,10 @@ class Vector3(Swizzler):
         """Return a vector with the component-wise negation of this vector."""
         return Vector3(-self.x, -self.y, -self.z)
 
+    def __repr__(self) -> str:
+        """Return a string representatoin of this vector's construction."""
+        return f"Vector3(x={self.x}, y={self.y}, z={self.z})"
+
     __rmul__ = __mul__
 
     def __round__(self, places: int = 0) -> "Vector3":
