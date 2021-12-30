@@ -1,16 +1,21 @@
+# Letter variable names in this file match common mathematical notation.
+# Local variables maintain more concise mathematical equations.
+# pylint: disable=invalid-name,too-many-locals
+
 import enum
 import functools
 import math
-from typing import List
 
 from .vector3 import Vector3
 
-# All of these functions convert quaternion representations to intrinsic euler angles
-# This is done by converting the quaternion representation to a partial matrix representation and then to an euler angle representation
-# There are two solutions in general (unless the representation is singular, i.e. gimbal lock)
+# All of these functions convert quaternion representations to intrinsic euler angles.
+# The quaternion representation is first converted to a partial matrix representation.
+# The partial matrix representation is then converted to an euler angle representation.
+# There are two solutions in general (unless the representation is singular, i.e. gimbal lock).
 
-# TODO: Need to handle singular cases
-def zyz(r, x, y, z):
+
+def zyz(r: float, x: float, y: float, z: float) -> list[list[float]]:
+    """Return ZYZ Euler angles from quaternion components."""
     xz = 2 * x * z
     ry = 2 * r * y
     yz = 2 * y * z
@@ -34,7 +39,8 @@ def zyz(r, x, y, z):
     return results
 
 
-def zyx(r, x, y, z):
+def zyx(r: float, x: float, y: float, z: float) -> list[list[float]]:
+    """Return ZYX Euler angles from quaternion components."""
     xy = 2 * x * y
     xz = 2 * x * z
     ry = 2 * r * y
@@ -60,11 +66,14 @@ def zyx(r, x, y, z):
     return results
 
 
-def _not_implemented(r, x, y, z):
+def _not_implemented(r: float, x: float, y: float, z: float) -> None:
+    """Raise for conversion functions which are not implemented."""
     raise NotImplementedError
 
 
 class Axes(enum.Enum):
+    """All the different types of Euler angles."""
+
     ZXZ = functools.partial(_not_implemented)
     XYX = functools.partial(_not_implemented)
     YZY = functools.partial(_not_implemented)
@@ -79,31 +88,40 @@ class Axes(enum.Enum):
     YXZ = functools.partial(_not_implemented)
 
     @classmethod
-    def basis_vector(cls, axis: str):
+    def basis_vector(cls, axis: str) -> Vector3:
+        """Return a basis vector corresponding to the provided axis letter."""
         v = Vector3()
 
         # For now, allow exceptions for unrecognized `axis` to go uncaught
         setattr(v, axis, 1)
         return v
 
-    def convert(self, quaternion: "Quaternion"):
+    def convert(self, quaternion: "Quaternion") -> list[list[float]]:
+        """Return the Euler angles from the provided quaternion."""
         return self.value(*quaternion)
 
-    def reverse(self):
+    def reverse(self) -> "Axes":
+        """Return the reversed order Euler angles."""
         reversed_name = self.name[::-1]
         return Axes[reversed_name]
 
     @property
-    def vectors(self) -> List[Vector3]:
+    def vectors(self) -> list[Vector3]:
+        """Return the basis vectors corresponding to the Euler angles axes."""
         return [Axes.basis_vector(axis.lower()) for axis in self.name]
 
 
 class Order(enum.Enum):
+    """The two types of Euler angles."""
+
     INTRINSIC = enum.auto()
     EXTRINSIC = enum.auto()
 
 
-def angles(quaternion: "Quaternion", axes=Axes.ZYZ, order=Order.INTRINSIC):
+def angles(
+    quaternion: "Quaternion", axes: Axes = Axes.ZYZ, order: Order = Order.INTRINSIC
+) -> list[list[float]]:
+    """Return the requested Euler angles and type from the provided quaternion."""
     if not isinstance(axes, Axes) or not isinstance(order, Order):
         raise KeyError
 
