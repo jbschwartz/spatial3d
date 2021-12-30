@@ -10,15 +10,14 @@ class Ray:
 
     def __init__(self, origin: Vector3, direction: Vector3) -> None:
         self.origin = origin
-        # TODO: What about a zero-length direction vector?
-        self.direction = direction.normalize()
+        try:
+            self.direction = direction.normalize()
+        except ZeroDivisionError:
+            raise ValueError("The direction vectory must be non-zero") from ZeroDivisionError
 
-    def transform(self, transform: Transform) -> "Ray":
-        """Return a transformed ray given the provided transform."""
-        new_origin = transform(self.origin, as_type="point")
-        new_direction = transform(self.direction, as_type="vector")
-
-        return Ray(new_origin, new_direction)
+    def __str__(self) -> str:
+        """Return the string representation of this ray."""
+        return f"{self.origin} + t * {self.direction}"
 
     def closest_intersection(self, collection: Iterable[object]) -> Intersection:
         """Return the closest intersection of the ray with the collection of objects."""
@@ -38,6 +37,9 @@ class Ray:
         """Return the location along ray given parameter t."""
         return self.origin + t * self.direction
 
-    def __str__(self) -> str:
-        """Return the string representation of this ray."""
-        return f"{self.origin} + t * {self.direction}"
+    def transform(self, transform: Transform) -> "Ray":
+        """Return a transformed ray given the provided transform."""
+        new_origin = transform(self.origin, as_type="point")
+        new_direction = transform(self.direction, as_type="vector")
+
+        return Ray(new_origin, new_direction)
