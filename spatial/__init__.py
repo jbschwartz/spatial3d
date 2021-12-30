@@ -1,3 +1,5 @@
+"""Spatial library."""
+
 from .aabb import AABB
 from .coordinate_axes import CoordinateAxes
 from .dual import Dual
