@@ -4,58 +4,53 @@ from spatial import Intersection
 
 
 class TestIntersection(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.miss = Intersection.Miss()
         self.near = Intersection(0.5, "a")
         self.far = Intersection(1.0, "b")
 
-    def test_negative_t_throws(self):
-        with self.assertRaises(AssertionError):
+    def test__new__raises_for_negative_t_values(self) -> None:
+        with self.assertRaises(ValueError):
             Intersection(-1.0, None)
 
-    def test_t_and_obj_are_optional(self):
+    def test__new__parameters_t_and_obj_are_optional(self) -> None:
         x = Intersection(None, None)
 
         self.assertIsNone(x.t)
         self.assertIsNone(x.obj)
 
-    def test_t_and_obj_are_immutable(self):
-        t = 1.0
-        obj = "Something"
-        x = Intersection(t, obj)
-
-        with self.assertRaises(AttributeError):
-            x.t = None
-
-        with self.assertRaises(AttributeError):
-            x.obj = None
-
-        self.assertAlmostEqual(x.t, t)
-        self.assertEqual(x.obj, obj)
-
-    def test_intersection_miss_factory_is_not_hit(self):
+    def test_miss_creates_an_intersection_which_is_not_a_hit(self) -> None:
         self.assertFalse(self.miss.hit)
+        self.assertIsNone(self.miss.t)
+        self.assertIsNone(self.miss.obj)
 
-    def test_positive_t_is_hit_regardless_of_obj(self):
-        xs = [Intersection(0, None), Intersection(1.0, None), Intersection(1.0, "Something")]
+    def test_hit_returns_true_for_positive_t(self) -> None:
+        cases = [Intersection(0, None), Intersection(1.0, None), Intersection(1.0, "Something")]
 
-        for x in xs:
-            with self.subTest(f"With object: {x.obj}"):
-                self.assertTrue(x.hit)
+        for case in cases:
+            with self.subTest(case=case):
+                self.assertTrue(case.hit)
 
-    def test_closer_than_for_found_intersections(self):
+    def test_closer_than_returns_true_for_found_intersections(self) -> None:
         self.assertTrue(self.near.closer_than(self.far))
         self.assertFalse(self.far.closer_than(self.near))
 
-    def test_closer_than_always_returns_true_valid_against_miss(self):
+    def test_closer_than_returns_true_compared_to_misses(self) -> None:
         self.assertTrue(self.near.closer_than(self.miss))
 
-    def test_closer_than_always_returns_false_for_a_miss(self):
-        for x in [self.miss, self.near, self.far]:
-            with self.subTest(f"Against intersection t: {x.t}"):
-                self.assertFalse(self.miss.closer_than(x))
+    def test_closer_than_returns_false_for_a_miss(self) -> None:
+        for case in [self.miss, self.near, self.far]:
+            with self.subTest(case=case):
+                self.assertFalse(self.miss.closer_than(case))
 
-    def test_closer_than_always_returns_false_for_identical_intersections(self):
-        for x in [self.miss, self.near, self.far]:
-            with self.subTest(f"Against intersection t: {x.t}"):
-                self.assertFalse(x.closer_than(x))
+    def test_closer_than_returns_false_for_identical_intersections(self) -> None:
+        for case in [self.miss, self.near, self.far]:
+            with self.subTest(case=case):
+                self.assertFalse(case.closer_than(case))
+
+    def test_intersection_attributes_t_and_obj_are_immutable(self) -> None:
+        with self.assertRaises(AttributeError):
+            self.near.t = None
+
+        with self.assertRaises(AttributeError):
+            self.near.obj = None
