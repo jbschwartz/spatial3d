@@ -1,6 +1,6 @@
 from .aabb import AABB
 from .intersection import Intersection
-from .kdtree import KDTree
+from .kdtree import KDTreeNode
 from .ray import Ray
 
 
@@ -22,7 +22,7 @@ class Mesh:
         meshes = file_parser.parse(file_path)
 
         for mesh in meshes:
-            mesh.accelerator = KDTree
+            mesh.accelerator = KDTreeNode
 
         return meshes
 
@@ -32,7 +32,7 @@ class Mesh:
 
     @accelerator.setter
     def accelerator(self, accelerator):
-        self._accelerator = accelerator(self)
+        self._accelerator = accelerator(self.aabb, self.facets)
 
     def transform(self, transform: "Transform") -> "Mesh":
         transformed_facets = [f.transform(transform) for f in self.facets]

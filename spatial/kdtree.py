@@ -89,25 +89,3 @@ class KDTreeNode:
             return ray.closest_intersection(self.facets)
 
         return ray.closest_intersection(self.children)
-
-
-class KDTree:
-    """A kd-tree acceleration structure for space partitioning objects."""
-
-    def __init__(self, mesh: "Mesh") -> None:
-        self.root = KDTreeNode(mesh.aabb, mesh.facets)
-
-        self.construct()
-
-    def construct(self) -> None:
-        """Construct the kd-tree."""
-        self.root.branch()
-
-    def intersect(self, ray: Ray) -> Intersection:
-        """Return the intersection between the ray and the objects in the kd-tree."""
-        return self.root.intersect(ray)
-
-    def update(self, mesh: "Mesh") -> None:
-        """Overwrite the kd-tree with the provided mesh."""
-        # The full tree needs to be reconstructed when the mesh is changed so just re-initialize
-        self.__init__(mesh)
