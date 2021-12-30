@@ -2,11 +2,10 @@ import math
 import unittest
 
 from spatial import Quaternion, Transform, Vector3
-from spatial.euler import Axes, Order
 
 
 class TestTransform(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.pureTranslate = Transform.from_axis_angle_translation(translation=Vector3(4, 2, 6))
         self.pureRotate = Transform.from_axis_angle_translation(
             axis=Vector3.X(), angle=math.radians(180)
@@ -16,92 +15,76 @@ class TestTransform(unittest.TestCase):
         )
         self.point = Vector3(3, 4, 5)
 
-    def test_init(self):
-        """
-        Transform accepts ...
-        """
-        pass
+    def test__init__defaults_to_identity_transformation(self) -> None:
+        t = Transform()
+        self.assertEqual(t.dual.r, Quaternion(1, 0, 0, 0))
+        self.assertEqual(t.dual.d, Quaternion(0, 0, 0, 0))
+        self.assertEqual(t(self.point, as_type="point"), self.point)
 
-    def test_from_json(self):
-        translation = [1, 2, 3]
-        angles = [-30, 60, 90]
-        axes = "ZYZ"
-        order = "INTRINSIC"
+    def test_Identity_returns_the_identity_transformation(self) -> None:
+        t = Transform.Identity()
+        self.assertEqual(t.dual.r, Quaternion(1, 0, 0, 0))
+        self.assertEqual(t.dual.d, Quaternion(0, 0, 0, 0))
+        self.assertEqual(t(self.point, as_type="point"), self.point)
 
-        payload = {
-            "translation": translation,
-            "euler": {"angles": angles, "axes": axes, "order": order},
-        }
+    def test_from_axis_angle_translation_constructs_a_transform_given_components(self) -> None:
+        self.assertEqual(self.pureTranslate.transform(Vector3()), Vector3(4, 2, 6))
+        self.assertAlmostEqual(self.pureRotate.transform(Vector3.Z()), -Vector3.Z())
 
-        expected = Transform.from_orientation_translation(
-            Quaternion.from_euler(list(map(math.radians, angles)), Axes[axes], Order[order]),
-            Vector3(*translation),
-        )
+    def test_from_orientation_translation_constructs_a_transform_given_components(self) -> None:
+        q = Quaternion.from_axis_angle(axis=Vector3.X(), angle=math.radians(180))
+        t = Transform.from_orientation_translation(q, translation=Vector3(4, 2, 6))
 
-        result = Transform.from_json(payload)
+        self.assertAlmostEqual(t.transform(self.point), Vector3(7, -2, 1))
 
-        self.assertAlmostEqual(result.dual, expected.dual)
+    def test__call__applies_the_transformation_to_the_passed_object(self) -> None:
+        self.assertEqual(self.pureTranslate(self.point), Vector3(7, 6, 11))
+        self.assertEqual(self.pureRotate(self.point), Vector3(3, -4, -5))
 
-    def test_from_json_raises(self):
-        failed_payload = {
-            "translation": [1, 2, 3],
-            "euler": {"angles": [-30, 60, 90], "axes": "ZZZ", "order": "SIC"},
-        }
+        self.assertAlmostEqual(self.both(self.point), Vector3(7, -2, 1))
 
-        with self.assertRaises(KeyError):
-            _ = Transform.from_json(failed_payload)
+    def test__call__applies_the_transformation_to_the_passed_objects(self) -> None:
+        points = [self.point, Vector3(7, -2, 1)]
+        results = self.both(points)
 
-        del failed_payload["translation"]
+        self.assertAlmostEqual(results[0], Vector3(7, -2, 1))
+        self.assertAlmostEqual(results[1], Vector3(11, 4, 5))
 
-        with self.assertRaises(KeyError):
-            _ = Transform.from_json(failed_payload)
+    def test__call__returns_notimplemented_for_incompatible_types(self) -> None:
+        self.assertTrue(self.both("string") == NotImplemented)
 
-    def test_mul(self):
+    def test__mul__composes_two_transformations(self) -> None:
         # Rotate then translate
         combined = self.pureTranslate * self.pureRotate
-        result = combined(self.point)
-        expected = self.pureTranslate(self.pureRotate(self.point))  # Vector3(7, -2, 1)
-
-        self.assertAlmostEqual(result.x, expected.x)
-        self.assertAlmostEqual(result.y, expected.y)
-        self.assertAlmostEqual(result.z, expected.z)
+        self.assertAlmostEqual(
+            combined(self.point), self.pureTranslate(self.pureRotate(self.point))
+        )
 
         # Translate then rotate
         combined = self.pureRotate * self.pureTranslate
-        result = combined(self.point)
-        expected = self.pureRotate(self.pureTranslate(self.point))  # Vector3(7, -6, -11)
+        self.assertAlmostEqual(
+            combined(self.point), self.pureRotate(self.pureTranslate(self.point))
+        )
 
-        self.assertAlmostEqual(result.x, expected.x)
-        self.assertAlmostEqual(result.y, expected.y)
-        self.assertAlmostEqual(result.z, expected.z)
+    def test__mul__returns_notimplemented_for_incompatible_types(self) -> None:
+        self.assertTrue(self.both.__mul__("string") == NotImplemented)
 
-    def test_call(self):
-        # Pure translation
-        expected = Vector3(7, 6, 11)
-        self.assertEqual(self.pureTranslate(self.point), expected)
+    def test_rotation_returns_the_rotation_component_of_the_transform(self) -> None:
+        self.assertEqual(self.pureRotate.rotation, self.pureRotate.dual.r)
 
-        # Pure rotation
-        expected = Vector3(3, -4, -5)
-        self.assertEqual(self.pureRotate(self.point), expected)
+    def test_translation_returns_the_translation_component_of_the_transform(self) -> None:
+        self.assertEqual(self.pureTranslate.translation, Vector3(4, 2, 6))
 
-        # Rotation and translation (in that order)
-        result = self.both(self.point)
-        expected = Vector3(7, -2, 1)
-
-        self.assertAlmostEqual(result.x, expected.x)
-        self.assertAlmostEqual(result.y, expected.y)
-        self.assertAlmostEqual(result.z, expected.z)
-
-    def test_translation(self):
-        expected = Vector3(4, 2, 6)
-        self.assertEqual(self.pureTranslate.translation, expected)
-
-    def test_rotation(self):
-        expected = self.pureRotate.dual.r
-        self.assertEqual(self.pureRotate.rotation, expected)
-
-    def test_inverse(self):
-        expected = self.point
-
+    def test_inverse_returns_the_inverse_of_the_transform(self) -> None:
         inverse = self.both.inverse()
-        self.assertAlmostEqual(inverse(self.both(self.point)), expected)
+        self.assertAlmostEqual(inverse(self.both(self.point)), self.point)
+
+    def test_transform_applies_the_transformation_to_the_passed_object(self) -> None:
+        self.assertEqual(self.pureTranslate.transform(self.point), Vector3(7, 6, 11))
+        self.assertEqual(self.pureRotate.transform(self.point), Vector3(3, -4, -5))
+
+        self.assertAlmostEqual(self.both.transform(self.point), Vector3(7, -2, 1))
+
+    def test_transform_raises_for_an_unknown_as_type(self) -> None:
+        with self.assertRaises(KeyError):
+            self.pureTranslate.transform(self.point, as_type="Unknown")
