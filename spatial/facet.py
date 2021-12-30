@@ -1,6 +1,3 @@
-import math
-from typing import Iterable
-
 from .aabb import AABB
 from .exceptions import DegenerateTriangleError
 from .intersection import Intersection
@@ -12,10 +9,10 @@ from .vector3 import Vector3
 class Facet:
     """A piece of surface geometry (typically a triangle)."""
 
-    def __init__(self, vertices: Iterable = None, normal: Vector3 = None) -> None:
-        self._aabb = None
-        self._computed_normal = None
-        self._edges = None
+    def __init__(self, vertices: list[Vector3] = None, normal: Vector3 = None) -> None:
+        self._aabb: AABB = None
+        self._computed_normal: Vector3 = None
+        self._edges: list[Vector3] = None
 
         self.vertices = vertices or []
         self.normal = normal
@@ -37,7 +34,7 @@ class Facet:
         return self._computed_normal
 
     @property
-    def edges(self) -> Iterable:
+    def edges(self) -> list[Vector3]:
         """Lazy return a list of Facet edges."""
         if not self._edges:
             self.compute_edges()
@@ -45,12 +42,14 @@ class Facet:
         return self._edges
 
     def transform(self, transform: Transform) -> "Facet":
-        transformed_normal = self.normal.transform(transform, as_type="vector")
-        transformed_vertices = [v.transform(transform, as_type="point") for v in self.vertices]
+        """Return a facet transformed with the provided transform."""
+        transformed_normal = transform(self.normal, as_type="vector")
+        transformed_vertices = [transform(v, as_type="point") for v in self.vertices]
 
         return Facet(transformed_vertices, transformed_normal)
 
     def scale(self, scale: float = 1) -> "Facet":
+        """Return a facet scaled by the provided scale factor."""
         transformed_vertices = [scale * v for v in self.vertices]
 
         return Facet(transformed_vertices, self.computed_normal)
@@ -60,7 +59,6 @@ class Facet:
 
         Choose whether or not to recompute the lazy evaluated properties (e.g. edges, aabb).
         """
-
         self.vertices.append(vertex)
 
         if recompute:
@@ -73,18 +71,17 @@ class Facet:
             self.edges.extend([vertex - self.vertices[-1], self.vertices[0] - vertex])
 
     def is_triangle(self) -> bool:
-        """Returns True if the Facet has 3 vertices."""
+        """Return True if the Facet has 3 vertices."""
         return len(self.vertices) == 3
 
     def intersect(self, ray: Ray, check_back_facing: bool = False) -> Intersection:
-        """Returns the Intersection with parametric value of ray (or Intersection.Miss() for a miss).
+        """Return the Intersection with parametric value of ray (or Intersection.Miss() for a miss).
 
         Returns Intersection.Miss() when the ray origin is in the triangle and the ray points away.
         Returns the ray origin when the ray origin is in the triangle and the ray points towards.
 
         This function implements the Moller-Trumbore intersection algorithm.
         """
-
         E1 = self.edges[0]
         E2 = -self.edges[2]
         P = ray.direction % E2
@@ -121,16 +118,16 @@ class Facet:
         self._edges.append(self.vertices[0] - self.vertices[-1])
 
         assert all(
-            [isinstance(edge, Vector3) for edge in self._edges]
+            (isinstance(edge, Vector3) for edge in self._edges)
         ), "All edges must be of Vector3 type"
 
     def compute_aabb(self) -> None:
         """Construct the AABB bounding the Facet from the Facet's current vertices."""
-        self._aabb = AABB.from_points(self.vertices)
+        self._aabb = AABB(self.vertices)
 
     def compute_normal(self) -> None:
         """Compute the normal vector from the Facet's current vertices."""
         try:
             self._computed_normal = (self.edges[0] % self.edges[1]).normalize()
         except ZeroDivisionError:
-            raise DegenerateTriangleError("Degenerate triangle found")
+            raise DegenerateTriangleError("Degenerate triangle found") from ZeroDivisionError
