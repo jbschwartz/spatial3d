@@ -6,7 +6,7 @@ import enum
 import functools
 import math
 
-from .vector3 import Vector3
+from spatial.vector3 import Vector3
 
 # All of these functions convert quaternion representations to intrinsic euler angles.
 # The quaternion representation is first converted to a partial matrix representation.
@@ -14,7 +14,7 @@ from .vector3 import Vector3
 # There are two solutions in general (unless the representation is singular, i.e. gimbal lock).
 
 
-def zyz(r: float, x: float, y: float, z: float) -> list[list[float]]:
+def _zyz(r: float, x: float, y: float, z: float) -> list[list[float]]:
     """Return ZYZ Euler angles from quaternion components."""
     xz = 2 * x * z
     ry = 2 * r * y
@@ -39,7 +39,7 @@ def zyz(r: float, x: float, y: float, z: float) -> list[list[float]]:
     return results
 
 
-def zyx(r: float, x: float, y: float, z: float) -> list[list[float]]:
+def _zyx(r: float, x: float, y: float, z: float) -> list[list[float]]:
     """Return ZYX Euler angles from quaternion components."""
     xy = 2 * x * y
     xz = 2 * x * z
@@ -77,14 +77,14 @@ class Axes(enum.Enum):
     ZXZ = functools.partial(_not_implemented)
     XYX = functools.partial(_not_implemented)
     YZY = functools.partial(_not_implemented)
-    ZYZ = functools.partial(zyz)
+    ZYZ = functools.partial(_zyz)
     XZX = functools.partial(_not_implemented)
     YXY = functools.partial(_not_implemented)
     XYZ = functools.partial(_not_implemented)
     YZX = functools.partial(_not_implemented)
     ZXY = functools.partial(_not_implemented)
     XZY = functools.partial(_not_implemented)
-    ZYX = functools.partial(zyx)
+    ZYX = functools.partial(_zyx)
     YXZ = functools.partial(_not_implemented)
 
     @classmethod
@@ -109,29 +109,3 @@ class Axes(enum.Enum):
     def vectors(self) -> list[Vector3]:
         """Return the basis vectors corresponding to the Euler angles axes."""
         return [Axes.basis_vector(axis.lower()) for axis in self.name]
-
-
-class Order(enum.Enum):
-    """The two types of Euler angles."""
-
-    INTRINSIC = enum.auto()
-    EXTRINSIC = enum.auto()
-
-
-def angles(
-    quaternion: "Quaternion", axes: Axes = Axes.ZYZ, order: Order = Order.INTRINSIC
-) -> list[list[float]]:
-    """Return the requested Euler angles and type from the provided quaternion."""
-    if not isinstance(axes, Axes) or not isinstance(order, Order):
-        raise KeyError
-
-    # Take advantage of extrinsic being the reverse axes order intrinsic solution reversed
-    if order == Order.EXTRINSIC:
-        axes = axes.reverse()
-
-    solutions = axes.convert(quaternion)
-
-    if order == Order.EXTRINSIC:
-        solutions = [angles[::-1] for angles in solutions]
-
-    return solutions
