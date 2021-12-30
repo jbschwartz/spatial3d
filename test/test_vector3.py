@@ -65,6 +65,12 @@ class TestVector3(unittest.TestCase):
     def test__neg__returns_the_negation(self) -> None:
         self.assertEqual(-self.v1, Vector3(1, -2, 3))
 
+    def test__repr__contains_the_components_of_the_vector(self) -> None:
+        self.assertTrue("Vector3" in repr(self.v1))
+        self.assertTrue(str(self.v1.x) in repr(self.v1))
+        self.assertTrue(str(self.v1.y) in repr(self.v1))
+        self.assertTrue(str(self.v1.z) in repr(self.v1))
+
     def test__round__returns_the_components_rounded(self) -> None:
         self.assertEqual(round(Vector3(1.1, -2.4, 2.9)), Vector3(1, -2, 3))
         self.assertEqual(round(Vector3(1.12, -2.44, 2.92), 1), Vector3(1.1, -2.4, 2.9))
