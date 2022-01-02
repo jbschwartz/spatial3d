@@ -30,29 +30,23 @@ class KDTreeNode:
 
         splitting_plane = self.splitting_plane(depth)
 
-        for child in self.candidate_children(*splitting_plane):
-            node = KDTreeNode(*child)
+        # Create a node for the left and right after splitting.
+        nodes = zip(self.aabb.split(*splitting_plane), self.split_facets(*splitting_plane))
+
+        for (aabb, facets) in nodes:
+            node = KDTreeNode(aabb, facets)
             node.branch(depth + 1)
 
             self.children.append(node)
 
         # Interrior nodes to the KDTree should not have any facets (only leaf nodes should).
         # If we've gotten this far, this node is an interrior node
-        self.facets = None
+        self.facets = []
 
     def can_branch(self, depth: int) -> bool:
         """Return true if this node can be split into two child nodes."""
         # TODO: Maybe use a more sophisticated cost function to evaluate whether we should branch.
         return len(self.facets) > 0 and depth < DEPTH_BOUND
-
-    def candidate_children(
-        self, plane_axis: CoordinateAxes, plane_value: float
-    ) -> Tuple[Tuple[AABB, list[Facet]]]:
-        """Get child AABBs and facet lists from a given splitting plane."""
-        child_boxes = self.aabb.split(plane_axis, plane_value)
-        child_facets = self.split_facets(plane_axis, plane_value)
-
-        return zip(child_boxes, child_facets)
 
     def intersect(self, ray: Ray) -> Intersection:
         """Intersect ray with node and return closest found intersection.
