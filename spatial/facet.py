@@ -1,4 +1,3 @@
-import warnings
 from functools import cached_property
 from typing import Iterable
 
@@ -43,22 +42,6 @@ class Facet:
     def is_triangle(self) -> bool:
         """Return true if the facet has three vertices."""
         return len(self.vertices) == 3
-
-    def append(self, vertex: Vector3, recompute: bool = True) -> None:
-        """Add a vertex to the Facet.
-
-        Choose whether or not to recompute the lazy evaluated properties (e.g. edges, aabb).
-        """
-        warnings.warn(
-            "Facet.append is deprecated. Pass all vertices to __init__ instead.", DeprecationWarning
-        )
-
-        self.vertices.append(vertex)
-
-        if recompute:
-            for attr in ["aabb", "computed_normal", "edges"]:
-                if getattr(self, attr) is not None:
-                    delattr(self, attr)
 
     def intersect(self, ray: Ray, check_back_facing: bool = False) -> Intersection:
         """Return the Intersection with parametric value of ray (or Intersection.Miss() for a miss).

@@ -37,22 +37,8 @@ class TestFacet(unittest.TestCase):
 
     def test_is_triangle_returns_true_for_three_vertices(self) -> None:
         self.assertTrue(self.facet.is_triangle)
-        self.facet.append(Vector3())
+        self.facet.vertices.append(Vector3())
         self.assertFalse(self.facet.is_triangle)
-
-    def test_append_adds_a_vertex_to_the_facet_and_clears_cached_properties(self) -> None:
-        aabb = self.facet.aabb
-
-        self.facet.append(Vector3(0, -100, 0))
-        self.assertEqual(len(self.facet.vertices), 4)
-        self.assertNotEqual(self.facet.aabb.min, aabb.min)
-
-    def test_append_optionally_keeps_cached_properties(self) -> None:
-        aabb = self.facet.aabb
-
-        self.facet.append(Vector3(0, -100, 0), recompute=False)
-        self.assertEqual(len(self.facet.vertices), 4)
-        self.assertEqual(self.facet.aabb.min, aabb.min)
 
     def test_intersect_returns_the_intersection_if_one_exists(self):
         def compute_t(ray: Ray, intersection: Vector3) -> Optional[Vector3]:
