@@ -1,4 +1,5 @@
-import math, unittest
+import math
+import unittest
 
 from spatial import Dual, Matrix4, Quaternion, Transform, Vector3
 

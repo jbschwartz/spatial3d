@@ -1,4 +1,5 @@
-import math, unittest
+import math
+import unittest
 
 from spatial import Quaternion, Vector3, quaternion
 from spatial.euler import Axes, Order

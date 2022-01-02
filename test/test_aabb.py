@@ -1,4 +1,5 @@
-import math, unittest
+import math
+import unittest
 
 from spatial import AABB, CoordinateAxes, Ray, Vector3
 

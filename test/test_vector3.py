@@ -1,6 +1,7 @@
-import math, unittest
+import math
+import unittest
 
-from spatial.vector3 import Vector3, angle_between, almost_equal, cross, normalize
+from spatial.vector3 import Vector3, almost_equal, angle_between, cross, normalize
 
 
 class TestVector3(unittest.TestCase):

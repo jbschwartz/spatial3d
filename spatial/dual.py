@@ -1,6 +1,7 @@
 from typing import Generic, TypeVar, Union
 
-from .quaternion import Quaternion, conjugate as quaternion_conjugate
+from .quaternion import Quaternion
+from .quaternion import conjugate as quaternion_conjugate
 
 T = TypeVar("T", float, int, Quaternion)
 
