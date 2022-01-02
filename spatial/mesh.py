@@ -43,19 +43,9 @@ class Mesh:
     def accelerator(self, accelerator: type) -> None:
         """Set the spatial accelerator used."""
         self._accelerator = accelerator(self.aabb, self.facets)
+        self._accelerator.branch()
 
-    def transform(self, transform: Transform) -> "Mesh":
-        """Return a mesh transformed by the provided transform."""
-        transformed_facets = [facet.transform(transform) for facet in self.facets]
-
-        return Mesh(self.name, transformed_facets)
-
-    def scale(self, scale: float = 1.0) -> "Mesh":
-        """Return a mesh scaled about the origin by the provided factor."""
-        transformed_facets = [facet.scale(scale) for facet in self.facets]
-
-        return Mesh(self.name, transformed_facets)
-
+    @property
     def vertices(self) -> Generator[Vector3, None, None]:
         """Generate list of mesh vertices returned grouped by facet."""
         for facet in self.facets:
@@ -70,7 +60,8 @@ class Mesh:
         self.facets.append(facet)
 
         if self.accelerator:
-            self.accelerator.update(self, facet)
+            # Reinitialize the accelerator by passing its type to the setter.
+            self.accelerator = type(self.accelerator)
 
     def intersect(self, local_ray: Ray) -> Intersection:
         """Return the closest intersection between the ray and mesh.
@@ -82,3 +73,15 @@ class Mesh:
 
         # Otherwise we brute force the computation.
         return local_ray.closest_intersection(self.facets)
+
+    def scale(self, scale: float = 1.0) -> "Mesh":
+        """Return a mesh scaled about the origin by the provided factor."""
+        transformed_facets = [facet.scale(scale) for facet in self.facets]
+
+        return Mesh(self.name, transformed_facets)
+
+    def transform(self, transform: Transform) -> "Mesh":
+        """Return a mesh transformed by the provided transform."""
+        transformed_facets = [facet.transform(transform) for facet in self.facets]
+
+        return Mesh(self.name, transformed_facets)
