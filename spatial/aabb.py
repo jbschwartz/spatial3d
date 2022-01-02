@@ -134,7 +134,7 @@ class AABB:
         if self.min[axis] >= value or self.max[axis] <= value:
             raise ValueError(
                 f"The split plane ({value}) is outside of the bounding box: "
-                "({self.min[axis]} , {self.max[axis]})"
+                f"({self.min[axis]} , {self.max[axis]})"
             )
 
         left_max = Vector3(*self.max)
