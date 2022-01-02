@@ -1,4 +1,5 @@
-import math, unittest
+import math
+import unittest
 from typing import Optional
 
 from spatial import AABB, Edge, Facet, Intersection, Ray, Vector3

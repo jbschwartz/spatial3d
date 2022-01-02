@@ -1,4 +1,5 @@
-import math, unittest
+import math
+import unittest
 
 from spatial import Facet, Ray, Transform, Vector3, vector3
 
