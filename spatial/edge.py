@@ -24,6 +24,11 @@ class Edge:
         return NotImplemented
 
     @cached_property
+    def length(self) -> float:
+        """Return the length of the edge."""
+        return self.vector.length()
+
+    @cached_property
     def vector(self) -> Vector3:
         """Return the edge's vector from start to end."""
         return self.end - self.start

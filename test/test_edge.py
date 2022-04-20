@@ -28,5 +28,8 @@ class TestEdge(unittest.TestCase):
         self.assertTrue(self.edge.__eq__(2) == NotImplemented)
         self.assertTrue(self.edge.__eq__("string") == NotImplemented)
 
+    def test_length_returns_the_length_of_the_edge(self) -> None:
+        self.assertEqual(self.edge.length, (self.start - self.end).length())
+
     def test_vector_returns_the_vector_between_the_edges_endpoints(self) -> None:
         self.assertEqual(self.edge.vector, self.end - self.start)
