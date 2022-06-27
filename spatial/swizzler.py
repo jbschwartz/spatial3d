@@ -1,7 +1,7 @@
 # This class is meant to be inherited from so the lack of public methods is normal.
 # pylint: disable=too-few-public-methods
 
-from typing import Any
+from typing import Any, List
 
 
 class Swizzler:
@@ -13,7 +13,7 @@ class Swizzler:
     See Vector3 and Quaternion.
     """
 
-    def __getattr__(self, name: str) -> list[Any]:
+    def __getattr__(self, name: str) -> List[Any]:
         """Return a list of values of the composed parameters.
 
         All parameters are considered to be a single letter long.

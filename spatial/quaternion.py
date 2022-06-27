@@ -1,5 +1,5 @@
 import math
-from typing import Union
+from typing import List, Union
 
 from .euler import Axes, Order
 from .swizzler import Swizzler
@@ -25,7 +25,7 @@ class Quaternion(Swizzler):
         return cls(math.cos(half_angle), axis.x, axis.y, axis.z)
 
     @classmethod
-    def from_euler(cls, angles: list[float], axes: Axes, order: Order) -> "Quaternion":
+    def from_euler(cls, angles: List[float], axes: Axes, order: Order) -> "Quaternion":
         """Construct a quaternion from euler angles (in radians)."""
         quaternion = cls()
 

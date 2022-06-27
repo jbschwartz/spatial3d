@@ -1,6 +1,6 @@
 import math
 from functools import cached_property
-from typing import Iterable, Optional, Tuple, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 from .coordinate_axes import CoordinateAxes
 from .vector3 import Vector3
@@ -34,7 +34,7 @@ class AABB:
         return self.min + (self.size / 2)
 
     @cached_property
-    def corners(self) -> list[Vector3]:
+    def corners(self) -> List[Vector3]:
         """Return all eight corner points of the bounding box."""
         size = self.size
         x = Vector3(x=size.x)

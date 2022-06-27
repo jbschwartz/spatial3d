@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import List, Generator
 
 from .aabb import AABB
 from .facet import Facet
@@ -12,7 +12,7 @@ from .vector3 import Vector3
 class Mesh:
     """A 3D mesh composed of facets."""
 
-    def __init__(self, name: str = None, facets: list[Facet] = None):
+    def __init__(self, name: str = None, facets: List[Facet] = None):
         self.name = name
         self.facets = facets or []
         self.aabb = AABB()
