@@ -5,6 +5,7 @@
 import enum
 import functools
 import math
+from typing import List
 
 from spatial.vector3 import Vector3
 
@@ -14,7 +15,7 @@ from spatial.vector3 import Vector3
 # There are two solutions in general (unless the representation is singular, i.e. gimbal lock).
 
 
-def _zyz(r: float, x: float, y: float, z: float) -> list[list[float]]:
+def _zyz(r: float, x: float, y: float, z: float) -> List[List[float]]:
     """Return ZYZ Euler angles from quaternion components."""
     xz = round(2 * x * z, 7)
     ry = round(2 * r * y, 7)
@@ -39,7 +40,7 @@ def _zyz(r: float, x: float, y: float, z: float) -> list[list[float]]:
     return results
 
 
-def _zyx(r: float, x: float, y: float, z: float) -> list[list[float]]:
+def _zyx(r: float, x: float, y: float, z: float) -> List[List[float]]:
     """Return ZYX Euler angles from quaternion components."""
     xy = round(2 * x * y, 7)
     xz = round(2 * x * z, 7)
@@ -96,7 +97,7 @@ class Axes(enum.Enum):
         setattr(v, axis, 1)
         return v
 
-    def convert(self, quaternion: "Quaternion") -> list[list[float]]:
+    def convert(self, quaternion: "Quaternion") -> List[List[float]]:
         """Return the Euler angles from the provided quaternion."""
         return self.value(*quaternion)
 
@@ -106,6 +107,6 @@ class Axes(enum.Enum):
         return Axes[reversed_name]
 
     @property
-    def vectors(self) -> list[Vector3]:
+    def vectors(self) -> List[Vector3]:
         """Return the basis vectors corresponding to the Euler angles axes."""
         return [Axes.basis_vector(axis.lower()) for axis in self.name]

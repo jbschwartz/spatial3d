@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import Iterable
+from typing import Iterable, List
 
 from .aabb import AABB
 from .edge import Edge
@@ -31,7 +31,7 @@ class Facet:
             raise DegenerateTriangleError("Degenerate triangle found") from ZeroDivisionError
 
     @cached_property
-    def edges(self) -> list[Edge]:
+    def edges(self) -> List[Edge]:
         """Return a list of edges."""
         edges = [Edge(v1, v2) for v1, v2 in zip(self.vertices, self.vertices[1:])]
         edges.append(Edge(self.vertices[-1], self.vertices[0]))

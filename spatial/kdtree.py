@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 
 from .aabb import AABB
 from .coordinate_axes import CoordinateAxes
@@ -16,7 +16,7 @@ class KDTreeNode:
     def __init__(self, aabb: AABB, facets: Facet) -> None:
         self.aabb = aabb
         self.facets = facets
-        self.children: list[KDTreeNode] = []
+        self.children: List[KDTreeNode] = []
 
     @property
     def is_leaf(self) -> bool:
@@ -63,7 +63,7 @@ class KDTreeNode:
 
     def split_facets(
         self, plane_axis: CoordinateAxes, plane_value: float
-    ) -> Tuple[list[Facet], list[Facet]]:
+    ) -> Tuple[List[Facet], List[Facet]]:
         """Split the node's list of facets into left and right lists based on splitting plane."""
         left, right = [], []
 
