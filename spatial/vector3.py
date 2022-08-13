@@ -119,10 +119,12 @@ class Vector3(Swizzler):
 
         return NotImplemented
 
+    # pylint: disable=duplicate-code
     def __truediv__(self, other: Union[float, int]) -> "Vector3":
         """Return a vector with the component-wise scalar quotient of this vector."""
         if isinstance(other, (float, int)):
-            return Vector3(self.x / other, self.y / other, self.z / other)
+            reciprocal = 1 / other
+            return reciprocal * self
 
         return NotImplemented
 
@@ -136,7 +138,7 @@ class Vector3(Swizzler):
 
     def length_sq(self) -> float:
         """Return the squared length of the vector."""
-        return self.x ** 2 + self.y ** 2 + self.z ** 2
+        return self.x**2 + self.y**2 + self.z**2
 
     def normalize(self) -> "Vector3":
         """Normalize this vector to unit length.

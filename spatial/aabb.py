@@ -122,7 +122,7 @@ class AABB:
 
     def sphere_radius(self) -> float:
         """Return the radius of a bounding sphere which contains the bounding box."""
-        return max([(self.center - corner).length() for corner in self.corners])
+        return max((self.center - corner).length() for corner in self.corners)
 
     def split(self, axis: CoordinateAxes, value: float) -> Tuple["AABB", "AABB"]:
         """Return two new child bounding boxes from splitting the existing bounding box.

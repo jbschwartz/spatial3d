@@ -128,6 +128,7 @@ class Quaternion(Swizzler):
 
         return NotImplemented
 
+    # pylint: disable=duplicate-code
     def __truediv__(self, other: Union[float, int]) -> "Quaternion":
         """Return a quaternion with the component-wise scalar quotient of this quaternion."""
         if isinstance(other, (float, int)):
@@ -150,7 +151,7 @@ class Quaternion(Swizzler):
     # TODO: I need to make the naming consistent across all objects (i.e., I use length in Vector3)
     def norm(self) -> float:
         """Return the length of the quaternion."""
-        return math.sqrt(self.r ** 2 + self.x ** 2 + self.y ** 2 + self.z ** 2)
+        return math.sqrt(self.r**2 + self.x**2 + self.y**2 + self.z**2)
 
     def normalize(self) -> None:
         """Normalize the quaternion instance (i.e. norm of one)."""

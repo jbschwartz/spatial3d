@@ -22,7 +22,7 @@ def _zyz(r: float, x: float, y: float, z: float) -> List[List[float]]:
     yz = round(2 * y * z, 7)
     rx = round(2 * r * x, 7)
 
-    beta = math.acos(1 - 2 * (x ** 2 + y ** 2))
+    beta = math.acos(1 - 2 * (x**2 + y**2))
     if math.isclose(beta, 0):
         # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
         # TODO: Confirm that this is a valid way to handle the singular configuration.
@@ -49,9 +49,9 @@ def _zyx(r: float, x: float, y: float, z: float) -> List[List[float]]:
     rx = round(2 * r * x, 7)
     rz = round(2 * r * z, 7)
 
-    xSq = x ** 2
-    ySq = y ** 2
-    zSq = z ** 2
+    xSq = x**2
+    ySq = y**2
+    zSq = z**2
 
     beta = math.asin(-xz + ry)
 
