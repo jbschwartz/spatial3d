@@ -1,4 +1,4 @@
-from typing import List, Generator
+from typing import Generator, List
 
 from .aabb import AABB
 from .facet import Facet

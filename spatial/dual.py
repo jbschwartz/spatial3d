@@ -68,6 +68,7 @@ class Dual(Generic[T]):
 
         return NotImplemented
 
+    # pylint: disable=duplicate-code
     def __truediv__(self, other: Union[float, int]) -> "Dual":
         """Return a dual with the component-wise scalar quotient of this dual."""
         if isinstance(other, (float, int)):
