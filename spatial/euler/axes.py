@@ -17,10 +17,10 @@ from spatial.vector3 import Vector3
 
 def _zyz(r: float, x: float, y: float, z: float) -> List[List[float]]:
     """Return ZYZ Euler angles from quaternion components."""
-    xz = round(2 * x * z, 7)
-    ry = round(2 * r * y, 7)
-    yz = round(2 * y * z, 7)
-    rx = round(2 * r * x, 7)
+    xz = x * z
+    ry = r * y
+    yz = y * z
+    rx = r * x
 
     beta = math.acos(1 - 2 * (x**2 + y**2))
     if math.isclose(beta, 0):
@@ -42,12 +42,12 @@ def _zyz(r: float, x: float, y: float, z: float) -> List[List[float]]:
 
 def _zyx(r: float, x: float, y: float, z: float) -> List[List[float]]:
     """Return ZYX Euler angles from quaternion components."""
-    xy = round(2 * x * y, 7)
-    xz = round(2 * x * z, 7)
-    ry = round(2 * r * y, 7)
-    yz = round(2 * y * z, 7)
-    rx = round(2 * r * x, 7)
-    rz = round(2 * r * z, 7)
+    xy = 2 * x * y
+    xz = 2 * x * z
+    ry = 2 * r * y
+    yz = 2 * y * z
+    rx = 2 * r * x
+    rz = 2 * r * z
 
     xSq = x**2
     ySq = y**2
