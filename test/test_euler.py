@@ -29,7 +29,7 @@ class TestEuler(unittest.TestCase):
         results = angles(self.q, Axes.ZYX, Order.INTRINSIC)
         solutions = [
             [math.radians(-135), math.radians(45), math.radians(180)],
-            [math.radians(45), math.radians(225), math.radians(0)],
+            [math.radians(45), math.radians(135), math.radians(0)],
         ]
 
         self.checkSolutions(results, solutions)

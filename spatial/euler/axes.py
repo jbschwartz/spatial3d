@@ -56,7 +56,7 @@ def _zyx(r: float, x: float, y: float, z: float) -> List[List[float]]:
     beta = math.asin(-xz + ry)
 
     results = []
-    for yp in [beta, math.pi + beta]:
+    for yp in [beta, math.pi - beta]:
         sign = 1 if math.cos(yp) > 0 else -1
 
         xpp = math.atan2((yz + rx) * sign, (1 - 2 * (xSq + ySq)) * sign)
