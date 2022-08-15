@@ -31,11 +31,6 @@ class TestEuler(unittest.TestCase):
     def setUp(self) -> None:
         self.target_angles = [math.radians(135), math.radians(-45), math.radians(-30)]
 
-        q1 = Quaternion.from_axis_angle(axis=Vector3.Z(), angle=math.radians(90))
-        q2 = Quaternion.from_axis_angle(axis=Vector3.X(), angle=math.radians(90))
-
-        self.extrinsic = q1 * q2
-
     def checkSolutions(self, results, solutions, axes):
         results.sort(key=itemgetter(1), reverse=True)
         solutions.sort(key=itemgetter(1), reverse=True)
@@ -66,20 +61,21 @@ class TestEuler(unittest.TestCase):
         self.checkSolutions(results, solutions, Axes.ZYZ)
 
     def test_angles_returns_zyz_extrinsic_euler_angles(self) -> None:
-        results = angles(self.extrinsic, Axes.ZYZ, Order.EXTRINSIC)
-        solutions = [
-            [math.radians(90), math.radians(90), math.radians(0)],
-            [math.radians(-90), math.radians(-90), math.radians(-180)],
-        ]
+        q = Quaternion.from_euler(self.target_angles, Axes.ZXY, Order.INTRINSIC)
+        results = angles(q, Axes.YXZ, Order.EXTRINSIC)
+
+        self.target_angles.reverse()
+        solutions = build_solutions(self.target_angles, True)
 
         self.checkSolutions(results, solutions, Axes.ZYZ)
 
-    def test_angles_returns_zeros_for_singular_configurations(self) -> None:
-        singular_q = Quaternion.from_axis_angle(axis=Vector3.Z(), angle=math.radians(90))
+    def test_angles_returns_one_solution_for_singular_configurations(self) -> None:
+        angle = math.radians(90)
+        singular_q = Quaternion.from_axis_angle(axis=Vector3.Z(), angle=angle)
         results = angles(singular_q, Axes.ZYZ, Order.INTRINSIC)
 
-        self.assertTrue(len(results), 0)
-        self.assertEqual(results[0], [0, 0, 0])
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], [angle, 0, 0])
 
     def test_angles_raises_for_unknown_types(self) -> None:
         with self.assertRaises(TypeError):

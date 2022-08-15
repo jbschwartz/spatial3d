@@ -3,350 +3,27 @@
 # pylint: disable=invalid-name,too-many-locals
 
 import enum
-import functools
 import math
 from typing import List
 
 from spatial.vector3 import Vector3
 
-# All of these functions convert quaternion representations to intrinsic euler angles.
-# The quaternion representation is first converted to a partial matrix representation.
-# The partial matrix representation is then converted to an euler angle representation.
-# There are two solutions in general (unless the representation is singular, i.e. gimbal lock).
-
-
-def _xyx(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return XYX Euler angles from quaternion components."""
-    xz = x * z
-    ry = r * y
-    xy = x * y
-    rz = r * z
-
-    beta = math.acos(1 - 2 * (y**2 + z**2))
-    if math.isclose(beta, 0):
-        # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
-        # TODO: Confirm that this is a valid way to handle the singular configuration.
-        #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
-        return [[0, 0, 0]]
-
-    results = []
-    for zp in [beta, -beta]:
-        sign = 1 if math.sin(zp) > 0 else -1
-
-        xpp = math.atan2((xy - rz) * sign, (ry + xz) * sign)
-        x = math.atan2((xy + rz) * sign, (ry - xz) * sign)
-        results.append([x, zp, xpp])
-
-    return results
-
-
-def _xzx(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return XZX Euler angles from quaternion components."""
-    xz = x * z
-    ry = r * y
-    rz = r * z
-    xy = x * y
-
-    beta = math.acos(1 - 2 * (y**2 + z**2))
-    if math.isclose(beta, 0):
-        # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
-        # TODO: Confirm that this is a valid way to handle the singular configuration.
-        #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
-        return [[0, 0, 0]]
-
-    results = []
-    for zp in [beta, -beta]:
-        sign = 1 if math.sin(zp) > 0 else -1
-
-        xpp = math.atan2((xz + ry) * sign, (rz - xy) * sign)
-        x = math.atan2((xz - ry) * sign, (rz + xy) * sign)
-        results.append([x, zp, xpp])
-
-    return results
-
-
-def _yxy(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return YXY Euler angles from quaternion components."""
-    xy = x * y
-    rz = r * z
-    yz = y * z
-    rx = r * x
-
-    beta = math.acos(1 - 2 * (x**2 + z**2))
-    if math.isclose(beta, 0):
-        # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
-        # TODO: Confirm that this is a valid way to handle the singular configuration.
-        #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
-        return [[0, 0, 0]]
-
-    results = []
-    for zp in [beta, -beta]:
-        sign = 1 if math.sin(zp) > 0 else -1
-
-        xpp = math.atan2((xy + rz) * sign, (rx - yz) * sign)
-        x = math.atan2((xy - rz) * sign, (rx + yz) * sign)
-        results.append([x, zp, xpp])
-
-    return results
-
-
-def _yzy(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return YZY Euler angles from quaternion components."""
-    yz = y * z
-    rx = r * x
-    xy = x * y
-    rz = r * z
-
-    beta = math.acos(1 - 2 * (x**2 + z**2))
-    if math.isclose(beta, 0):
-        # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
-        # TODO: Confirm that this is a valid way to handle the singular configuration.
-        #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
-        return [[0, 0, 0]]
-
-    results = []
-    for zp in [beta, -beta]:
-        sign = 1 if math.sin(zp) > 0 else -1
-
-        xpp = math.atan2((yz - rx) * sign, (rz + xy) * sign)
-        x = math.atan2((yz + rx) * sign, (rz - xy) * sign)
-        results.append([x, zp, xpp])
-
-    return results
-
-
-def _zxz(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return ZXZ Euler angles from quaternion components."""
-    xz = x * z
-    ry = r * y
-    yz = y * z
-    rx = r * x
-
-    beta = math.acos(1 - 2 * (x**2 + y**2))
-    if math.isclose(beta, 0):
-        # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
-        # TODO: Confirm that this is a valid way to handle the singular configuration.
-        #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
-        return [[0, 0, 0]]
-
-    results = []
-    for yp in [beta, -beta]:
-        sign = 1 if math.sin(yp) > 0 else -1
-
-        zpp = math.atan2((xz - ry) * sign, (rx + yz) * sign)
-        z = math.atan2((xz + ry) * sign, (rx - yz) * sign)
-        results.append([z, yp, zpp])
-
-    return results
-
-
-def _zyz(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return ZYZ Euler angles from quaternion components."""
-    xz = x * z
-    ry = r * y
-    yz = y * z
-    rx = r * x
-
-    beta = math.acos(1 - 2 * (x**2 + y**2))
-    if math.isclose(beta, 0):
-        # Y is zero so there are multiple solutions (infinitely many?). Pick [0, 0, 0]
-        # TODO: Confirm that this is a valid way to handle the singular configuration.
-        #   That is, is there ever a case where choosing [0, 0, 0] is wrong?
-        return [[0, 0, 0]]
-
-    results = []
-    for yp in [beta, -beta]:
-        sign = 1 if math.sin(yp) > 0 else -1
-
-        zpp = math.atan2((yz + rx) * sign, (-xz + ry) * sign)
-        z = math.atan2((yz - rx) * sign, (xz + ry) * sign)
-        results.append([z, yp, zpp])
-
-    return results
-
-
-def _xyz(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return XYZ Euler angles from quaternion components."""
-    xy = 2 * x * y
-    xz = 2 * x * z
-    yz = 2 * y * z
-    rx = 2 * r * x
-    ry = 2 * r * y
-    rz = 2 * r * z
-
-    xSq = x**2
-    ySq = y**2
-    zSq = z**2
-
-    beta = math.asin(ry + xz)
-
-    results = []
-    for second in [beta, math.pi - beta]:
-        sign = 1 if math.cos(second) > 0 else -1
-
-        first = math.atan2((rx - yz) * sign, (1 - 2 * (xSq + ySq)) * sign)
-        third = math.atan2((rz - xy) * sign, (1 - 2 * (ySq + zSq)) * sign)
-
-        results.append([first, second, third])
-
-    return results
-
-
-def _xzy(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return XZY Euler angles from quaternion components."""
-    xy = 2 * x * y
-    xz = 2 * x * z
-    yz = 2 * y * z
-    rx = 2 * r * x
-    ry = 2 * r * y
-    rz = 2 * r * z
-
-    xSq = x**2
-    ySq = y**2
-    zSq = z**2
-
-    beta = math.asin(rz - xy)
-
-    results = []
-    for second in [beta, math.pi - beta]:
-        sign = 1 if math.cos(second) > 0 else -1
-
-        first = math.atan2((rx + yz) * sign, (1 - 2 * (xSq + zSq)) * sign)
-        third = math.atan2((ry + xz) * sign, (1 - 2 * (ySq + zSq)) * sign)
-
-        results.append([first, second, third])
-
-    return results
-
-
-def _yxz(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return YZX Euler angles from quaternion components."""
-    xy = 2 * x * y
-    xz = 2 * x * z
-    yz = 2 * y * z
-    rx = 2 * r * x
-    ry = 2 * r * y
-    rz = 2 * r * z
-
-    xSq = x**2
-    ySq = y**2
-    zSq = z**2
-
-    beta = math.asin(rx - yz)
-
-    results = []
-    for second in [beta, math.pi - beta]:
-        sign = 1 if math.cos(second) > 0 else -1
-
-        first = math.atan2((ry + xz) * sign, (1 - 2 * (xSq + ySq)) * sign)
-        third = math.atan2((rz + xy) * sign, (1 - 2 * (xSq + zSq)) * sign)
-
-        results.append([first, second, third])
-
-    return results
-
-
-def _yzx(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return YZX Euler angles from quaternion components."""
-    xy = 2 * x * y
-    xz = 2 * x * z
-    yz = 2 * y * z
-    rx = 2 * r * x
-    ry = 2 * r * y
-    rz = 2 * r * z
-
-    xSq = x**2
-    ySq = y**2
-    zSq = z**2
-
-    beta = math.asin(rz + xy)
-
-    results = []
-    for second in [beta, math.pi - beta]:
-        sign = 1 if math.cos(second) > 0 else -1
-
-        first = math.atan2((ry - xz) * sign, (1 - 2 * (ySq + zSq)) * sign)
-        third = math.atan2((rx - yz) * sign, (1 - 2 * (xSq + zSq)) * sign)
-
-        results.append([first, second, third])
-
-    return results
-
-
-def _zxy(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return ZXY Euler angles from quaternion components."""
-    xy = 2 * x * y
-    xz = 2 * x * z
-    yz = 2 * y * z
-    rx = 2 * r * x
-    ry = 2 * r * y
-    rz = 2 * r * z
-
-    xSq = x**2
-    ySq = y**2
-    zSq = z**2
-
-    beta = math.asin(rx + yz)
-
-    results = []
-    for second in [beta, math.pi - beta]:
-        sign = 1 if math.cos(second) > 0 else -1
-
-        first = math.atan2((rz - xy) * sign, (1 - 2 * (xSq + zSq)) * sign)
-        third = math.atan2((ry - xz) * sign, (1 - 2 * (xSq + ySq)) * sign)
-
-        results.append([first, second, third])
-
-    return results
-
-
-def _zyx(r: float, x: float, y: float, z: float) -> List[List[float]]:
-    """Return ZYX Euler angles from quaternion components."""
-    xy = 2 * x * y
-    xz = 2 * x * z
-    yz = 2 * y * z
-    rx = 2 * r * x
-    ry = 2 * r * y
-    rz = 2 * r * z
-
-    xSq = x**2
-    ySq = y**2
-    zSq = z**2
-
-    beta = math.asin(ry - xz)
-
-    results = []
-    for yp in [beta, math.pi - beta]:
-        sign = 1 if math.cos(yp) > 0 else -1
-
-        xpp = math.atan2((yz + rx) * sign, (1 - 2 * (xSq + ySq)) * sign)
-        z = math.atan2((xy + rz) * sign, (1 - 2 * (ySq + zSq)) * sign)
-
-        results.append([z, yp, xpp])
-
-    return results
-
-
-def _not_implemented(r: float, x: float, y: float, z: float) -> None:
-    """Raise for conversion functions which are not implemented."""
-    raise NotImplementedError
-
 
 class Axes(enum.Enum):
     """All the different types of Euler angles."""
 
-    XYX = functools.partial(_xyx)
-    XZX = functools.partial(_xzx)
-    YXY = functools.partial(_yxy)
-    YZY = functools.partial(_yzy)
-    ZXZ = functools.partial(_zxz)
-    ZYZ = functools.partial(_zyz)
-    XYZ = functools.partial(_xyz)
-    YZX = functools.partial(_yzx)
-    ZXY = functools.partial(_zxy)
-    XZY = functools.partial(_xzy)
-    ZYX = functools.partial(_zyx)
-    YXZ = functools.partial(_yxz)
+    XYX = enum.auto()
+    XZX = enum.auto()
+    YXY = enum.auto()
+    YZY = enum.auto()
+    ZXZ = enum.auto()
+    ZYZ = enum.auto()
+    XYZ = enum.auto()
+    YZX = enum.auto()
+    ZXY = enum.auto()
+    XZY = enum.auto()
+    ZYX = enum.auto()
+    YXZ = enum.auto()
 
     @classmethod
     def basis_vector(cls, axis: str) -> Vector3:
@@ -359,7 +36,10 @@ class Axes(enum.Enum):
 
     def convert(self, quaternion: "Quaternion") -> List[List[float]]:
         """Return the Euler angles from the provided quaternion."""
-        return self.value(*quaternion)
+        if self.is_tait_bryan:
+            return self._tait_bryan(quaternion)
+
+        return self._proper(quaternion)
 
     @property
     def is_tait_bryan(self) -> bool:
@@ -375,3 +55,85 @@ class Axes(enum.Enum):
     def vectors(self) -> List[Vector3]:
         """Return the basis vectors corresponding to the Euler angles axes."""
         return [Axes.basis_vector(axis.lower()) for axis in self.name]
+
+    def _proper(self, quaternion: "Quaternion") -> List[List[float]]:
+        """Convert the provided Quaternion to intrinsic, proper Euler angles.
+
+        There are two solutions (unless the representation is singular, i.e., gimbal lock).
+
+        The function works by equating the quaternion's matrix representation to the Euler angle's
+        matrix representation and then solving for the Euler angles. Only a few of the matrix
+        elements are necessary.
+
+        The function was created by solving each different Euler angle and then looking at the
+        pattern although there is probably a nice mathematical basis for this.
+        """
+        # The indices of the axes used (e.g., YZY => 2, 3).
+        first_letter: int = ord(self.name[0]) - ord("X") + 1
+        second_letter: int = ord(self.name[1]) - ord("X") + 1
+        # The number of axes between first and second letter. Take the modulus so only the forward
+        # direction is considered (e.g., ZX => 1).
+        distance: int = (second_letter - first_letter) % 3
+
+        # The axis not used (e.g., YZY => X).
+        missing_letter: int = sum(range(4)) - (first_letter + second_letter)
+
+        a = quaternion[first_letter] * quaternion[second_letter]
+        b = quaternion[0] * quaternion[missing_letter]
+        c = quaternion[0] * quaternion[second_letter]
+        d = quaternion[first_letter] * quaternion[missing_letter]
+
+        # Use atan instead of acos as atan performs better for very small angle values.
+        cosine = 1 - 2 * (quaternion[second_letter] ** 2 + quaternion[missing_letter] ** 2)
+        beta = math.atan2(math.sqrt(1 - cosine * cosine), cosine)
+
+        if math.isclose(beta, 0):
+            # There is no rotation around the second axis so just compute the rotation around the
+            # first axis.
+            return [[2 * math.acos(quaternion[0]), 0, 0]]
+
+        results = []
+        for second in [beta, -beta]:
+            sign = 1 if math.sin(second) > 0 else -1
+
+            first = math.atan2((a - b) * sign, (c + d) * sign)
+            third = math.atan2((a + b) * sign, (c - d) * sign)
+
+            # If the rotational axes are adjacent, swap the first and third rotation.
+            if distance % 2 == 1:
+                first, third = third, first
+
+            results.append([first, second, third])
+
+        return results
+
+    def _tait_bryan(self, quaternion: "Quaternion") -> List[List[float]]:
+        # The indices of the axes used (e.g., YZX => 2, 3, 1).
+        first_letter: int = ord(self.name[0]) - ord("X") + 1
+        second_letter: int = ord(self.name[1]) - ord("X") + 1
+        third_letter: int = ord(self.name[2]) - ord("X") + 1
+
+        letters = [0, first_letter, second_letter, third_letter]
+
+        m = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+        for row_index, i in enumerate(letters):
+            for column_index, j in enumerate(letters):
+                m[row_index][column_index] = 2 * quaternion[i] * quaternion[j]
+
+        invert = 1 if self.name in ["XYZ", "YZX", "ZXY"] else -1
+        beta = math.asin(m[0][2] + (invert * m[1][3]))
+
+        results = []
+        for second in [beta, math.pi - beta]:
+            sign = 1 if math.cos(second) > 0 else -1
+
+            first = math.atan2(
+                (m[0][1] - (invert * m[2][3])) * sign, (1 - (m[1][1] + m[2][2]) / 1) * sign
+            )
+            third = math.atan2(
+                (m[0][3] - (invert * m[1][2])) * sign, (1 - (m[2][2] + m[3][3]) / 1) * sign
+            )
+
+            results.append([first, second, third])
+
+        return results
