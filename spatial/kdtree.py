@@ -39,8 +39,8 @@ class KDTreeNode:
 
             self.children.append(node)
 
-        # Interrior nodes to the KDTree should not have any facets (only leaf nodes should).
-        # If we've gotten this far, this node is an interrior node
+        # Interior nodes to the KDTree should not have any facets (only leaf nodes should).
+        # If we've gotten this far, this node is an interior node.
         self.facets = []
 
     def can_branch(self, depth: int) -> bool:
@@ -69,7 +69,7 @@ class KDTreeNode:
 
         for facet in self.facets:
             # Check minimum bound on left and maximum bound on right.
-            # This covers both scenarios: facets belonging to one side only or both sides
+            # This covers both scenarios: facets belonging to one side only or both sides.
             if facet.aabb.min[plane_axis] < plane_value:
                 left.append(facet)
             if facet.aabb.max[plane_axis] > plane_value:

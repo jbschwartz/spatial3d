@@ -47,7 +47,7 @@ class TestRay(unittest.TestCase):
             self.ray.evaluate(2), self.ray.origin + 2 * vector3.normalize(self.ray.direction)
         )
 
-    def test_tranform_transforms_the_rays_origin_and_direction(self) -> None:
+    def test_transform_transforms_the_rays_origin_and_direction(self) -> None:
         r = Ray(Vector3(1, 1, 0), Vector3(1, 1, 0))
         t = Transform.from_axis_angle_translation(
             axis=Vector3.Z(), angle=math.radians(-45), translation=Vector3(-math.sqrt(2), 0, 0)

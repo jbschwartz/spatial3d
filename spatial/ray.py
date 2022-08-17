@@ -13,7 +13,7 @@ class Ray:
         try:
             self.direction = direction.normalize()
         except ZeroDivisionError:
-            raise ValueError("The direction vectory must be non-zero") from ZeroDivisionError
+            raise ValueError("The direction vector must be non-zero") from ZeroDivisionError
 
     def __str__(self) -> str:
         """Return the string representation of this ray."""

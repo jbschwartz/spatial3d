@@ -94,7 +94,7 @@ class Vector3(Swizzler):
         return Vector3(-self.x, -self.y, -self.z)
 
     def __repr__(self) -> str:
-        """Return a string representatoin of this vector's construction."""
+        """Return a string representation of this vector's construction."""
         return f"Vector3(x={self.x}, y={self.y}, z={self.z})"
 
     __rmul__ = __mul__

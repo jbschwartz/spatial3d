@@ -88,7 +88,7 @@ class TestVector3(unittest.TestCase):
         self.assertTrue(str(self.v1.y) in str(self.v1))
         self.assertTrue(str(self.v1.z) in str(self.v1))
 
-    def test__sub__subracts_two_vectors(self) -> None:
+    def test__sub__subtracts_two_vectors(self) -> None:
         self.assertEqual(self.v1 - self.v2, Vector3(-3, 7, -6))
 
     def test__sub__returns_notimplemented_for_incompatible_types(self) -> None:
