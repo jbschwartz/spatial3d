@@ -56,7 +56,7 @@ class TestDual(unittest.TestCase):
         self.assertTrue(str(self.r1) in str(self.dq1))
         self.assertTrue(str(self.d1) in str(self.dq1))
 
-    def test__sub__subracts_two_duals(self) -> None:
+    def test__sub__subtracts_two_duals(self) -> None:
         self.assertEqual(self.dq1 - self.dq2, Dual(self.r1 - self.r2, self.d1 - self.d2))
 
     def test__sub__returns_notimplemented_for_incompatible_types(self) -> None:

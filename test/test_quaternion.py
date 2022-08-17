@@ -105,7 +105,7 @@ class TestQuaternion(unittest.TestCase):
         self.assertTrue(str(self.q.y) in str(self.q))
         self.assertTrue(str(self.q.z) in str(self.q))
 
-    def test__sub__subracts_two_quaternions(self) -> None:
+    def test__sub__subtracts_two_quaternions(self) -> None:
         self.assertEqual(self.q - self.r, Quaternion(-3, 5, 1, 5))
 
     def test__sub__returns_notimplemented_for_incompatible_types(self) -> None:

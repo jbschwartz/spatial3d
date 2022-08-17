@@ -76,7 +76,7 @@ class TestFacet(unittest.TestCase):
         for actual, vertex in zip(scaled_facet.vertices, self.vertices):
             self.assertEqual(actual, 2 * vertex)
 
-    def test_transform_returns_a_tranformed_facet(self) -> None:
+    def test_transform_returns_a_transformed_facet(self) -> None:
         t = Transform.from_axis_angle_translation(axis=Vector3.Z(), angle=math.radians(90))
         transformed_facet = self.facet.transform(t)
 
