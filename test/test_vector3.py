@@ -101,6 +101,10 @@ class TestVector3(unittest.TestCase):
     def test__truediv__returns_notimplemented_for_incompatible_types(self) -> None:
         self.assertTrue(self.v1.__truediv__("string") == NotImplemented)
 
+    def test_is_perpendicular_to_returns_true_for_perpendicular_vectors(self) -> None:
+        self.assertFalse(self.v1.is_perpendicular_to(self.v2))
+        self.assertTrue(Vector3.Z().is_perpendicular_to(Vector3.X()))
+
     def test_is_unit_returns_true_for_vectors_of_length_one(self) -> None:
         unit_vector = normalize(self.v1)
         self.assertFalse(self.v1.is_unit())

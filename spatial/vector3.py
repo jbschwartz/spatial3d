@@ -128,6 +128,10 @@ class Vector3(Swizzler):
 
         return NotImplemented
 
+    def is_perpendicular_to(self, other: "Vector3", tolerance: float = 0.00001) -> bool:
+        """Return True if the vector is perpendicular to the other vector."""
+        return math.isclose(self * other, 0, abs_tol=tolerance)
+
     def is_unit(self, tolerance: float = 0.00001) -> bool:
         """Return True if the vector has unit length (within a given tolerance)."""
         return math.isclose(self.length_sq(), 1.0, abs_tol=tolerance)
