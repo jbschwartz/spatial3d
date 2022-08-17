@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from typing import Iterable, Tuple, Union
 
 from . import dual, quaternion
 from .vector3 import Vector3
@@ -59,6 +59,15 @@ class Transform:
         return NotImplemented
 
     __rmul__ = __mul__
+
+    @property
+    def basis(self) -> Tuple[Vector3, Vector3, Vector3]:
+        """Return orthonormal basis vectors for the given transformation."""
+        return (
+            self.transform(Vector3.X(), as_type="vector"),
+            self.transform(Vector3.Y(), as_type="vector"),
+            self.transform(Vector3.Z(), as_type="vector"),
+        )
 
     @property
     def rotation(self) -> Quaternion:
