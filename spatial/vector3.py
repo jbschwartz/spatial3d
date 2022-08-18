@@ -54,6 +54,10 @@ class Vector3(Swizzler):
 
         return NotImplemented
 
+    def __format__(self, spec: str = "") -> str:
+        """Return the string representation following the format specification component-wise."""
+        return f"({self.x:{spec}}, {self.y:{spec}}, {self.z:{spec}})"
+
     def __getitem__(self, index: int) -> float:
         """Return the value of the component at the provided index."""
         components = ["x", "y", "z"]
@@ -110,7 +114,7 @@ class Vector3(Swizzler):
 
     def __str__(self) -> str:
         """Return the string representation of this vector."""
-        return f"({self.x}, {self.y}, {self.z})"
+        return format(self, "")
 
     def __sub__(self, other: "Vector3") -> "Vector3":
         """Return a vector with the component-wise difference of this vector and the other."""
