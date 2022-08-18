@@ -28,6 +28,31 @@ class Quaternion(Swizzler):
 
         return cls(math.cos(half_angle), axis.x, axis.y, axis.z)
 
+    @classmethod
+    def from_basis(cls, x: Vector3, y: Vector3, z: Vector3):
+        """Construct a quaternion from three mutually perpendicular basis vectors."""
+        assert all(
+            [x.is_perpendicular_to(y), y.is_perpendicular_to(z), z.is_perpendicular_to(x)]
+        ), "All basis vectors must be mutually perpendicular"
+
+        # Implementing the algorithm described in "Converting a Rotation Matrix to a Quaternion" by
+        # Mike Day, Insomniac Games
+        if z.z < 0:
+            if x.x > y.y:
+                t = 1 + x.x - y.y - z.z
+                quaternion = cls(y.z - z.y, t, x.y + y.x, z.x + x.z)
+            else:
+                t = 1 - x.x + y.y - z.z
+                quaternion = cls(z.x - x.z, x.y + y.x, t, y.z + z.y)
+        else:
+            if x.x < -y.y:
+                t = 1 - x.x - y.y + z.z
+                quaternion = cls(x.y - y.x, z.x + x.z, y.z + z.y, t)
+            else:
+                t = 1 + x.x + y.y + z.z
+                quaternion = cls(t, y.z - z.y, z.x - x.z, x.y - y.x)
+
+        return (0.5 / math.sqrt(t)) * quaternion
 
     @classmethod
     def from_euler(cls, angles: List[float], axes: Axes, order: Order) -> "Quaternion":

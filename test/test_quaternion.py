@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from spatial import Quaternion, Vector3, quaternion
+from spatial import Quaternion, Transform, Vector3, quaternion
 from spatial.euler import Axes, Order
 
 
@@ -18,6 +18,21 @@ class TestQuaternion(unittest.TestCase):
     def test__init__accepts_component_values(self) -> None:
         self.assertEqual(Quaternion(1, *self.axis), Quaternion(1, 1, 2, 3))
 
+    def test_from_basis_constructs_a_quaternion_from_axis_angle(self) -> None:
+        standard_basis = [Vector3.X(), Vector3.Y(), Vector3.Z()]
+        for angle in [math.pi / 4, 3 * math.pi / 4, 5 * math.pi / 4, 7 * math.pi / 4]:
+            with self.subTest(f"Angle: {math.degrees(angle)}"):
+                transform = Transform.from_axis_angle_translation(Vector3(1, -2, 3), angle)
+                actual = Quaternion.from_basis(*transform.basis)
+
+                # Q = -Q for all quaternions.
+                try:
+                    self.assertAlmostEqual(transform.rotation, actual)
+                except AssertionError:
+                    self.assertAlmostEqual(-transform.rotation, actual)
+
+                for standard_vector, actual_vector in zip(standard_basis, actual):
+                    self.assertTrue(actual_vector, actual.rotate(standard_vector))
 
     def test_from_axis_angle_constructs_a_quaternion_from_axis_angle(self) -> None:
         angle = math.radians(30)
