@@ -1,3 +1,4 @@
+import math
 from typing import Iterable
 
 from .dual import Dual
@@ -22,6 +23,20 @@ class Matrix4:
             self.elements = elements
         else:
             self.elements = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
+
+    @classmethod
+    def from_basis(cls, x: Vector3, y: Vector3, z: Vector3, origin: Vector3 = None):
+        """Construct a quaternion from three mutually perpendicular basis vectors."""
+        assert all(
+            [x.is_perpendicular_to(y), y.is_perpendicular_to(z), z.is_perpendicular_to(x)]
+        ), "All basis vectors must be mutually perpendicular"
+
+        assert all(
+            [math.isclose(x.length(), 1), math.isclose(y.length(), 1), math.isclose(z.length(), 1)]
+        ), "All basis vectors must be unit length"
+
+        o = origin or Vector3()
+        return cls([x.x, x.y, x.z, 0, y.x, y.y, y.z, 0, z.x, z.y, z.z, 0, o.x, o.y, o.z, 1])
 
     @classmethod
     def from_transform(cls, transform: Transform) -> "Matrix4":
