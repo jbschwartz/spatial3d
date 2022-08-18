@@ -21,8 +21,13 @@ class Quaternion(Swizzler):
     def from_axis_angle(cls, axis: Vector3, angle: float) -> "Quaternion":
         """Construct a quaternion from an axis and angle (in radians)."""
         half_angle = angle / 2
-        axis = math.sin(half_angle) * axis
+        try:
+            axis = math.sin(half_angle) * axis.normalize()
+        except ZeroDivisionError:
+            axis = Vector3()
+
         return cls(math.cos(half_angle), axis.x, axis.y, axis.z)
+
 
     @classmethod
     def from_euler(cls, angles: List[float], axes: Axes, order: Order) -> "Quaternion":

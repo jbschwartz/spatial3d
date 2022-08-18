@@ -18,10 +18,14 @@ class TestQuaternion(unittest.TestCase):
     def test__init__accepts_component_values(self) -> None:
         self.assertEqual(Quaternion(1, *self.axis), Quaternion(1, 1, 2, 3))
 
+
     def test_from_axis_angle_constructs_a_quaternion_from_axis_angle(self) -> None:
         angle = math.radians(30)
         c = math.cos(angle / 2)
         s = math.sin(angle / 2)
+
+        self.axis.normalize()
+
         expected = Quaternion(c, s * self.axis.x, s * self.axis.y, s * self.axis.z)
         self.assertEqual(Quaternion.from_axis_angle(self.axis, angle), expected)
 
@@ -141,6 +145,15 @@ class TestQuaternion(unittest.TestCase):
     def test_rotate_returns_a_rotated_vector(self) -> None:
         q = Quaternion.from_axis_angle(Vector3.X(), math.radians(90))
         self.assertAlmostEqual(q.rotate(Vector3(1, 0, 1)), Vector3(1, -1, 0))
+
+    def test_rotate_returns_a_rotated_vector_without_scaling_it(self) -> None:
+        q = Quaternion.from_axis_angle(6 * Vector3.X(), math.radians(90))
+
+        result = q.rotate(Vector3(1, 0, 1))
+        expected = Vector3(1, -1, 0)
+
+        self.assertAlmostEqual(result, expected)
+        self.assertAlmostEqual(result.length(), expected.length())
 
     def test_quaternion_conjugate_returns_the_conjugate(self) -> None:
         result = quaternion.conjugate(self.q)
