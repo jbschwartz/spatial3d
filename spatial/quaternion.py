@@ -158,13 +158,14 @@ class Quaternion(Swizzler):
         """Return the length of the quaternion."""
         return math.sqrt(self.r**2 + self.x**2 + self.y**2 + self.z**2)
 
-    def normalize(self) -> None:
+    def normalize(self) -> "Quaternion":
         """Normalize the quaternion instance (i.e. norm of one)."""
         norm = self.norm()
         self.r /= norm
         self.x /= norm
         self.y /= norm
         self.z /= norm
+        return self
 
     def rotate(self, vector: Vector3) -> Vector3:
         """Return the provided vector rotated by this quaternion."""
