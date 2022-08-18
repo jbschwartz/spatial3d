@@ -25,6 +25,36 @@ class TestMatrix4(unittest.TestCase):
         with self.assertRaises(TypeError):
             Matrix4([0] * 15)
 
+    def test_from_basis_constructs_a_matrix_from_three_basis_vectors_and_an_origin(self) -> None:
+        vectors = [
+            Vector3(1, 2, 3).normalize(),
+            Vector3(-4, -7, 6).normalize(),
+            Vector3(),
+            Vector3(-1, -2, -3),
+        ]
+        vectors[2] = (vectors[0] % vectors[1]).normalize()
+
+        matrix = Matrix4.from_basis(*vectors)
+
+        self.assertEqual(Vector3(*matrix.elements[0:3]), vectors[0])
+        self.assertEqual(Vector3(*matrix.elements[4:7]), vectors[1])
+        self.assertEqual(Vector3(*matrix.elements[8:11]), vectors[2])
+        self.assertEqual(Vector3(*matrix.elements[12:15]), vectors[3])
+
+    def test_from_basis_raises_for_non_orthonormal_vectors(self) -> None:
+        vectors = [Vector3(1, 2, 3), Vector3(4, 6, 7), Vector3(8, 9, 0), Vector3(-1, -2, -3)]
+        with self.assertRaises(AssertionError):
+            _ = Matrix4.from_basis(*vectors)
+
+        vectors = [
+            2 * Vector3.X(),
+            2 * Vector3.Y(),
+            2 * Vector3.Z(),
+            Vector3(-1, -2, -3),
+        ]
+        with self.assertRaises(AssertionError):
+            _ = Matrix4.from_basis(*vectors)
+
     def test_from_transform_constructs_a_matrix_from_a_dual_quaternion(self) -> None:
         for value, expected in zip(Matrix4.from_transform(self.transform).elements, self.expected):
             self.assertAlmostEqual(value, expected)
