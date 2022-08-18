@@ -101,6 +101,10 @@ class Quaternion(Swizzler):
 
         return NotImplemented
 
+    def __format__(self, spec: str = "") -> str:
+        """Return the string representation following the format specification component-wise."""
+        return f"({self.r:{spec}}, {self.x:{spec}}, {self.y:{spec}}, {self.z:{spec}})"
+
     def __getitem__(self, index: int) -> float:
         """Return the value of the component at the provided index."""
         components = ["r", "x", "y", "z"]
@@ -147,7 +151,7 @@ class Quaternion(Swizzler):
 
     def __str__(self) -> str:
         """Return the string representation of this quaternion."""
-        return f"({self.r}, {self.x}, {self.y}, {self.z})"
+        return format(self, "")
 
     def __sub__(self, other: "Quaternion") -> "Quaternion":
         """Return a quaternion with the component-wise difference of this and the other."""
