@@ -146,6 +146,9 @@ class TestQuaternion(unittest.TestCase):
         self.q.conjugate()
         self.assertEqual(self.q, expected)
 
+    def test_dot_computes_the_dot_product_of_two_quaternions(self) -> None:
+        self.assertEqual(self.q.dot(self.r), 0)
+
     def test_norm_returns_the_norm_of_the_quaternion(self) -> None:
         self.assertAlmostEqual(self.q.norm(), math.sqrt(30))
 
@@ -177,3 +180,7 @@ class TestQuaternion(unittest.TestCase):
         expected = self.q
 
         self.assertEqual(result, expected)
+
+    def test_quaternion_slerp_returns_the_endpoints_for_0_and_1(self) -> None:
+        self.assertAlmostEqual(quaternion.slerp(self.q.normalize(), self.r.normalize(), 0), self.q)
+        self.assertAlmostEqual(quaternion.slerp(self.q.normalize(), self.r.normalize(), 1), self.r)
