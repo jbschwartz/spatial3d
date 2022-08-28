@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "spatial"
-version = "0.6.1"
+version = "0.6.2"
 description = "A Python library for representing and working with 3D objects."
 authors = ["James Schwartz"]
 
