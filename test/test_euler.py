@@ -70,12 +70,14 @@ class TestEuler(unittest.TestCase):
         self.checkSolutions(results, solutions, Axes.ZYZ)
 
     def test_angles_returns_one_solution_for_singular_configurations(self) -> None:
-        angle = math.radians(90)
-        singular_q = Quaternion.from_axis_angle(axis=Vector3.Z(), angle=angle)
-        results = angles(singular_q, Axes.ZYZ, Order.INTRINSIC)
+        for angle in [0, 90, -90]:
+            with self.subTest(case=angle):
+                angle = math.radians(angle)
+                singular_q = Quaternion.from_axis_angle(axis=Vector3.Z(), angle=angle)
+                results = angles(singular_q, Axes.ZYZ, Order.INTRINSIC)
 
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0], [angle, 0, 0])
+                self.assertEqual(len(results), 1)
+                self.assertEqual(results[0], [angle, 0, 0])
 
     def test_angles_raises_for_unknown_types(self) -> None:
         with self.assertRaises(TypeError):

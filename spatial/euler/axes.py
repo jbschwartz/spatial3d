@@ -92,7 +92,13 @@ class Axes(enum.Enum):
         if math.isclose(beta, 0):
             # There is no rotation around the second axis so just compute the rotation around the
             # first axis.
-            return [[2 * math.acos(quaternion[0]), 0, 0]]
+
+            # Determine the polarity of the rotation by checking if the second Euler axis is
+            # parallel or anti-parallel to the axis of rotation. If the dot product is negative, the
+            # vectors are anti-parallel.
+            first_axis = getattr(Vector3, self.name[0].upper())()
+            polarity = -1 if (quaternion.vector * first_axis) < 0 else 1
+            return [[2 * math.acos(quaternion[0]) * polarity, 0, 0]]
 
         results = []
         for second in [beta, -beta]:
