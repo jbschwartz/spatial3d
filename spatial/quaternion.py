@@ -229,10 +229,12 @@ def slerp(q1: Quaternion, q2: Quaternion, alpha: float, shortest_path: bool = Tr
         q2 = -q2
         dot = q1.dot(q2)
 
-    # Clamp dot between [1, -1] to avoid domain errors in the subsequent arccosine.
-    dot = min(1, max(-1, dot))
+    # If the dot is 1 or -1, then theta is zero and the starting point should be returned.
+    if dot >= 1 or dot <= -1:
+        return q1
 
-    theta = math.acos(dot) * alpha
+    # Compute the half angle between the two quaternions and scale based on the parameter.
+    theta = alpha * math.acos(dot)
 
     q = (q2 - (q1 * dot)).normalize()
 

@@ -182,5 +182,19 @@ class TestQuaternion(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def test_quaternion_slerp_returns_the_endpoints_for_0_and_1(self) -> None:
-        self.assertAlmostEqual(quaternion.slerp(self.q.normalize(), self.r.normalize(), 0), self.q)
-        self.assertAlmostEqual(quaternion.slerp(self.q.normalize(), self.r.normalize(), 1), self.r)
+        self.q.normalize()
+        self.r.normalize()
+
+        self.assertAlmostEqual(quaternion.slerp(self.q, self.r, 0), self.q)
+        self.assertAlmostEqual(quaternion.slerp(self.q, self.r, 1), self.r)
+
+    def test_quaternion_slerp_returns_the_endpoints_for_identical_quaternions(self) -> None:
+        self.q.normalize()
+
+        steps = 10
+        for index in range(steps):
+            value = index / (steps - 1)
+            with self.subTest(case=value):
+                self.assertAlmostEqual(quaternion.slerp(self.q, self.q, value), self.q)
+                # This example causes a division by zero (fixed in v0.6.2).
+                self.assertAlmostEqual(quaternion.slerp(self.I, self.I, value), self.I)
