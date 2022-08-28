@@ -70,14 +70,16 @@ class TestEuler(unittest.TestCase):
         self.checkSolutions(results, solutions, Axes.ZYZ)
 
     def test_angles_returns_one_solution_for_proper_singular_configurations(self) -> None:
-        for angle in [0, 90, -90]:
-            with self.subTest(case=angle):
-                angle = math.radians(angle)
-                singular_q = Quaternion.from_axis_angle(axis=Vector3.Z(), angle=angle)
-                results = angles(singular_q, Axes.ZYZ, Order.INTRINSIC)
+        values = [math.radians(90), 0, math.radians(-30)]
+        expected_values = [math.radians(60), 0, 0]
+        for axes in (axes for axes in Axes if not axes.is_tait_bryan):
+            with self.subTest(case=axes):
+                q = Quaternion.from_euler(values, axes, Order.INTRINSIC)
+                results = angles(q, axes, Order.INTRINSIC)
 
                 self.assertEqual(len(results), 1)
-                self.assertEqual(results[0], [angle, 0, 0])
+                for actual, expected in zip(results[0], expected_values):
+                    self.assertAlmostEqual(actual, expected)
 
     def test_angles_returns_one_solution_for_tait_bryan_singular_configurations(self) -> None:
         values = [0, math.radians(90), math.radians(-30)]
