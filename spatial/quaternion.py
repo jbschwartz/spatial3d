@@ -182,6 +182,10 @@ class Quaternion(Swizzler):
         self.y = -self.y
         self.z = -self.z
 
+    def dot(self, other: "Quaternion") -> float:
+        """Return the dot product of this quaternion and the other."""
+        return self.r * other.r + self.x * other.x + self.y * other.y + self.z * other.z
+
     # TODO: I need to make the naming consistent across all objects (i.e., I use length in Vector3)
     def norm(self) -> float:
         """Return the length of the quaternion."""
@@ -205,3 +209,31 @@ class Quaternion(Swizzler):
 def conjugate(q: Quaternion) -> Quaternion:
     """Return the conjugate of the provided quaternion."""
     return Quaternion(q.r, -q.x, -q.y, -q.z)
+
+
+def slerp(q1: Quaternion, q2: Quaternion, alpha: float, shortest_path: bool = True) -> Quaternion:
+    """Return the spherical linear interpolation between q1 and q2.
+
+    By default, the function follows the shortest path.
+    """
+    assert 0 <= alpha <= 1, "Interpolation value must be between 0 and 1"
+    assert math.isclose(q1.norm(), 1) and math.isclose(
+        q2.norm(), 1
+    ), "Both quaternions must be unit length"
+
+    dot = q1.dot(q2)
+
+    # Ensure the shortest path is used by negating the second quaternion when the dot product is
+    # negative.
+    if dot < 0 and shortest_path:
+        q2 = -q2
+        dot = q1.dot(q2)
+
+    # Clamp dot between [1, -1] to avoid domain errors in the subsequent arccosine.
+    dot = min(1, max(-1, dot))
+
+    theta = math.acos(dot) * alpha
+
+    q = (q2 - (q1 * dot)).normalize()
+
+    return q1 * math.cos(theta) + q * math.sin(theta)
