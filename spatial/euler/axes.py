@@ -57,7 +57,7 @@ class Axes(enum.Enum):
         return [Axes.basis_vector(axis.lower()) for axis in self.name]
 
     def _proper(self, quaternion: "Quaternion") -> List[List[float]]:
-        """Convert the provided Quaternion to intrinsic, proper Euler angles.
+        """Convert the provided unit Quaternion to intrinsic, proper Euler angles.
 
         There are two solutions (unless the representation is singular, i.e., gimbal lock).
 
@@ -68,6 +68,8 @@ class Axes(enum.Enum):
         The function was created by solving each different Euler angle and then looking at the
         pattern although there is probably a nice mathematical basis for this.
         """
+        assert math.isclose(quaternion.norm(), 1), "The quaternion must be normalized"
+
         # The indices of the axes used (e.g., YZY => 2, 3).
         first_letter: int = ord(self.name[0]) - ord("X") + 1
         second_letter: int = ord(self.name[1]) - ord("X") + 1
@@ -108,6 +110,12 @@ class Axes(enum.Enum):
         return results
 
     def _tait_bryan(self, quaternion: "Quaternion") -> List[List[float]]:
+        """Convert the provided Quaternion to intrinsic, Tait-Bryant Euler angles.
+
+        See the notes in the `Axes._proper` function.
+        """
+        assert math.isclose(quaternion.norm(), 1), "The quaternion must be normalized"
+
         # The indices of the axes used (e.g., YZX => 2, 3, 1).
         first_letter: int = ord(self.name[0]) - ord("X") + 1
         second_letter: int = ord(self.name[1]) - ord("X") + 1
@@ -128,10 +136,10 @@ class Axes(enum.Enum):
             sign = 1 if math.cos(second) > 0 else -1
 
             first = math.atan2(
-                (m[0][1] - (invert * m[2][3])) * sign, (1 - (m[1][1] + m[2][2]) / 1) * sign
+                (m[0][1] - (invert * m[2][3])) * sign, (1 - (m[1][1] + m[2][2])) * sign
             )
             third = math.atan2(
-                (m[0][3] - (invert * m[1][2])) * sign, (1 - (m[2][2] + m[3][3]) / 1) * sign
+                (m[0][3] - (invert * m[1][2])) * sign, (1 - (m[2][2] + m[3][3])) * sign
             )
 
             results.append([first, second, third])
