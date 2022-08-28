@@ -86,8 +86,8 @@ class Axes(enum.Enum):
         d = quaternion[first_letter] * quaternion[missing_letter]
 
         # Use atan instead of acos as atan performs better for very small angle values.
-        cosine = 1 - 2 * (quaternion[second_letter] ** 2 + quaternion[missing_letter] ** 2)
-        beta = math.atan2(math.sqrt(1 - cosine * cosine), cosine)
+        cos_beta = 1 - 2 * (quaternion[second_letter] ** 2 + quaternion[missing_letter] ** 2)
+        beta = math.atan2(math.sqrt(1 - cos_beta * cos_beta), cos_beta)
 
         if math.isclose(beta, 0):
             # There is no rotation around the second axis so just compute the rotation around the
@@ -135,7 +135,21 @@ class Axes(enum.Enum):
                 m[row_index][column_index] = 2 * quaternion[i] * quaternion[j]
 
         invert = 1 if self.name in ["XYZ", "YZX", "ZXY"] else -1
-        beta = math.asin(m[0][2] + (invert * m[1][3]))
+
+        sin_beta = m[0][2] + (invert * m[1][3])
+
+        if math.isclose(sin_beta, 1) or math.isclose(sin_beta, -1):
+            # The first and third axes have been aligned in gimbal lock. This singularity produces
+            # only one solution and must be handled specially.
+            return [
+                [
+                    0,
+                    math.copysign(math.pi / 2, sin_beta),
+                    2 * math.atan2(quaternion[third_letter], quaternion[0]),
+                ]
+            ]
+
+        beta = math.asin(sin_beta)
 
         results = []
         for second in [beta, math.pi - beta]:
