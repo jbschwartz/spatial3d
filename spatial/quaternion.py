@@ -2,6 +2,7 @@ import math
 from typing import List, Union
 
 from .euler import Axes, Order
+from .parameters import parameters
 from .swizzler import Swizzler
 from .vector3 import Vector3
 
@@ -32,7 +33,11 @@ class Quaternion(Swizzler):
     def from_basis(cls, x: Vector3, y: Vector3, z: Vector3):
         """Construct a quaternion from three mutually perpendicular basis vectors."""
         assert all(
-            [x.is_perpendicular_to(y), y.is_perpendicular_to(z), z.is_perpendicular_to(x)]
+            [
+                x.is_perpendicular_to(y, tolerance=parameters["ASSERT_ABS_TOL"]),
+                y.is_perpendicular_to(z, tolerance=parameters["ASSERT_ABS_TOL"]),
+                z.is_perpendicular_to(x, tolerance=parameters["ASSERT_ABS_TOL"]),
+            ]
         ), "All basis vectors must be mutually perpendicular"
 
         # Implementing the algorithm described in "Converting a Rotation Matrix to a Quaternion" by
@@ -217,8 +222,8 @@ def slerp(q1: Quaternion, q2: Quaternion, alpha: float, shortest_path: bool = Tr
     By default, the function follows the shortest path.
     """
     assert 0 <= alpha <= 1, "Interpolation value must be between 0 and 1"
-    assert math.isclose(q1.norm(), 1) and math.isclose(
-        q2.norm(), 1
+    assert math.isclose(q1.norm(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]) and math.isclose(
+        q2.norm(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]
     ), "Both quaternions must be unit length"
 
     dot = q1.dot(q2)
