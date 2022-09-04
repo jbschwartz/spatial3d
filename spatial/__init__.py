@@ -9,6 +9,7 @@ from .intersection import Intersection
 from .kdtree import KDTreeNode
 from .matrix4 import Matrix4
 from .mesh import Mesh
+from .parameters import parameters
 from .quaternion import Quaternion
 from .ray import Ray
 from .transform import Transform

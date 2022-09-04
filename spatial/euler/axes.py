@@ -8,6 +8,8 @@ from typing import List
 
 from spatial.vector3 import Vector3
 
+from ..parameters import parameters
+
 
 class Axes(enum.Enum):
     """All the different types of Euler angles."""
@@ -68,7 +70,9 @@ class Axes(enum.Enum):
         The function was created by solving each different Euler angle and then looking at the
         pattern although there is probably a nice mathematical basis for this.
         """
-        assert math.isclose(quaternion.norm(), 1), "The quaternion must be normalized"
+        assert math.isclose(
+            quaternion.norm(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]
+        ), "The quaternion must be normalized"
 
         # The indices of the axes used (e.g., YZY => 2, 3).
         first_letter: int = ord(self.name[0]) - ord("X") + 1
@@ -120,7 +124,9 @@ class Axes(enum.Enum):
 
         See the notes in the `Axes._proper` function.
         """
-        assert math.isclose(quaternion.norm(), 1), "The quaternion must be normalized"
+        assert math.isclose(
+            quaternion.norm(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]
+        ), "The quaternion must be normalized"
 
         # The indices of the axes used (e.g., YZX => 2, 3, 1).
         first_letter: int = ord(self.name[0]) - ord("X") + 1
