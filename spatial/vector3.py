@@ -180,6 +180,27 @@ def cross(v1: Vector3, v2: Vector3) -> Vector3:
     return Vector3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x)
 
 
+def is_orthonormal_basis(x: Vector3, y: Vector3, z: Vector3, tolerance: float = 0.00001) -> bool:
+    """Return True if the three vectors are of unit length and mutually perpendicular."""
+    are_perpendicular = all(
+        [
+            x.is_perpendicular_to(y, tolerance=tolerance),
+            y.is_perpendicular_to(z, tolerance=tolerance),
+            z.is_perpendicular_to(x, tolerance=tolerance),
+        ]
+    )
+
+    are_unit_length = all(
+        [
+            math.isclose(x.length(), 1, abs_tol=tolerance),
+            math.isclose(y.length(), 1, abs_tol=tolerance),
+            math.isclose(z.length(), 1, abs_tol=tolerance),
+        ]
+    )
+
+    return are_perpendicular and are_unit_length
+
+
 def normalize(v: Vector3) -> Vector3:
     """Return the vector normalized to unit length.
 

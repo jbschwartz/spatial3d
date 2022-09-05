@@ -1,11 +1,10 @@
-import math
 from typing import Iterable
 
 from .dual import Dual
 from .parameters import parameters
 from .quaternion import Quaternion, conjugate
 from .transform import Transform
-from .vector3 import Vector3
+from .vector3 import Vector3, is_orthonormal_basis
 
 
 class Matrix4:
@@ -28,21 +27,9 @@ class Matrix4:
     @classmethod
     def from_basis(cls, x: Vector3, y: Vector3, z: Vector3, origin: Vector3 = None):
         """Construct a quaternion from three mutually perpendicular basis vectors."""
-        assert all(
-            [
-                x.is_perpendicular_to(y, tolerance=parameters["ASSERT_ABS_TOL"]),
-                y.is_perpendicular_to(z, tolerance=parameters["ASSERT_ABS_TOL"]),
-                z.is_perpendicular_to(x, tolerance=parameters["ASSERT_ABS_TOL"]),
-            ]
-        ), "All basis vectors must be mutually perpendicular"
-
-        assert all(
-            [
-                math.isclose(x.length(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]),
-                math.isclose(y.length(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]),
-                math.isclose(z.length(), 1, abs_tol=parameters["ASSERT_ABS_TOL"]),
-            ]
-        ), "All basis vectors must be unit length"
+        assert is_orthonormal_basis(
+            x, y, z, tolerance=parameters["ASSERT_ABS_TOL"]
+        ), "All basis vectors must be mutually perpendicular and of unit length"
 
         o = origin or Vector3()
         return cls([x.x, x.y, x.z, 0, y.x, y.y, y.z, 0, z.x, z.y, z.z, 0, o.x, o.y, o.z, 1])
