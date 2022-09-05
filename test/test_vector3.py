@@ -1,7 +1,14 @@
 import math
 import unittest
 
-from spatial.vector3 import Vector3, almost_equal, angle_between, cross, normalize
+from spatial.vector3 import (
+    Vector3,
+    almost_equal,
+    angle_between,
+    cross,
+    is_orthonormal_basis,
+    normalize,
+)
 
 
 class TestVector3(unittest.TestCase):
@@ -146,6 +153,16 @@ class TestVector3(unittest.TestCase):
         expected = Vector3(-9, -3, 1)
         self.assertAlmostEqual(cross(self.v1, self.v2), expected)
         self.assertAlmostEqual(cross(self.v2, self.v1), -expected)
+
+    def test_vector3_is_orthonormal_basis_returns_true_for_an_orthonormal_basis(self) -> None:
+        basis = [Vector3.X(), Vector3.Y(), Vector3.Z()]
+        self.assertTrue(is_orthonormal_basis(*basis))
+
+        basis = [2 * Vector3.X(), Vector3.Y(), Vector3.Z()]
+        self.assertFalse(is_orthonormal_basis(*basis))
+
+        basis = [Vector3(1, 1, 0).normalize(), Vector3.Y(), Vector3.Z()]
+        self.assertFalse(is_orthonormal_basis(*basis))
 
     def test_vector3_normalize_returns_the_normalized_vector(self) -> None:
         result = normalize(self.v1)

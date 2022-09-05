@@ -4,7 +4,7 @@ from typing import List, Union
 from .euler import Axes, Order
 from .parameters import parameters
 from .swizzler import Swizzler
-from .vector3 import Vector3
+from .vector3 import Vector3, is_orthonormal_basis
 
 
 class Quaternion(Swizzler):
@@ -32,13 +32,9 @@ class Quaternion(Swizzler):
     @classmethod
     def from_basis(cls, x: Vector3, y: Vector3, z: Vector3):
         """Construct a quaternion from three mutually perpendicular basis vectors."""
-        assert all(
-            [
-                x.is_perpendicular_to(y, tolerance=parameters["ASSERT_ABS_TOL"]),
-                y.is_perpendicular_to(z, tolerance=parameters["ASSERT_ABS_TOL"]),
-                z.is_perpendicular_to(x, tolerance=parameters["ASSERT_ABS_TOL"]),
-            ]
-        ), "All basis vectors must be mutually perpendicular"
+        assert is_orthonormal_basis(
+            x, y, z, tolerance=parameters["ASSERT_ABS_TOL"]
+        ), "All basis vectors must be mutually perpendicular and of unit length"
 
         # Implementing the algorithm described in "Converting a Rotation Matrix to a Quaternion" by
         # Mike Day, Insomniac Games
