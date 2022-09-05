@@ -1,6 +1,9 @@
 import math
-from typing import Union, overload
+from typing import Optional, Union, overload
 
+from spatial import parameters
+
+from .parameters import parameters
 from .swizzler import Swizzler
 
 
@@ -132,8 +135,9 @@ class Vector3(Swizzler):
 
         return NotImplemented
 
-    def is_perpendicular_to(self, other: "Vector3", tolerance: float = 0.00001) -> bool:
+    def is_perpendicular_to(self, other: "Vector3", tolerance: Optional[float] = None) -> bool:
         """Return True if the vector is perpendicular to the other vector."""
+        tolerance = tolerance or parameters["ABS_TOL"]
         return math.isclose(self * other, 0, abs_tol=tolerance)
 
     def is_unit(self, tolerance: float = 0.00001) -> bool:
@@ -160,11 +164,13 @@ class Vector3(Swizzler):
         return self
 
 
-def almost_equal(v1: Vector3, v2: Vector3, tol=0.00001) -> bool:
+def almost_equal(v1: Vector3, v2: Vector3, tolerance: Optional[float] = None) -> bool:
     """Return True if two vectors are equal within a given tolerance."""
+    tolerance = tolerance or parameters["ABS_TOL"]
+
     difference = v1 - v2
 
-    return math.isclose(difference.length_sq(), 0.0, abs_tol=tol)
+    return math.isclose(difference.length_sq(), 0.0, abs_tol=tolerance)
 
 
 def angle_between(v1: Vector3, v2: Vector3) -> float:
@@ -180,8 +186,12 @@ def cross(v1: Vector3, v2: Vector3) -> Vector3:
     return Vector3(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x)
 
 
-def is_orthonormal_basis(x: Vector3, y: Vector3, z: Vector3, tolerance: float = 0.00001) -> bool:
+def is_orthonormal_basis(
+    x: Vector3, y: Vector3, z: Vector3, tolerance: Optional[float] = None
+) -> bool:
     """Return True if the three vectors are of unit length and mutually perpendicular."""
+    tolerance = tolerance or parameters["ABS_TOL"]
+
     are_perpendicular = all(
         [
             x.is_perpendicular_to(y, tolerance=tolerance),
