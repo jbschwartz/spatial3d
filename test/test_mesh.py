@@ -2,7 +2,7 @@ import math
 import unittest
 from unittest import mock
 
-from spatial import AABB, Facet, KDTreeNode, Mesh, Transform, Vector3
+from spatial3d import AABB, Facet, KDTreeNode, Mesh, Transform, Vector3
 
 
 class TestMesh(unittest.TestCase):

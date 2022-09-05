@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from spatial import Dual, Matrix4, Quaternion, Transform, Vector3
+from spatial3d import Dual, Matrix4, Quaternion, Transform, Vector3
 
 
 class TestMatrix4(unittest.TestCase):

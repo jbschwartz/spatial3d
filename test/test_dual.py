@@ -1,7 +1,7 @@
 import unittest
 
-from spatial import Dual, Quaternion, dual, quaternion
-from spatial.vector3 import Vector3
+from spatial3d import Dual, Quaternion, dual, quaternion
+from spatial3d.vector3 import Vector3
 
 
 class TestDual(unittest.TestCase):

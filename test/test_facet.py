@@ -2,9 +2,9 @@ import math
 import unittest
 from typing import Optional
 
-from spatial import AABB, Edge, Facet, Intersection, Ray, Vector3
-from spatial.exceptions import DegenerateTriangleError
-from spatial.transform import Transform
+from spatial3d import AABB, Edge, Facet, Intersection, Ray, Vector3
+from spatial3d.exceptions import DegenerateTriangleError
+from spatial3d.transform import Transform
 
 
 class TestFacet(unittest.TestCase):

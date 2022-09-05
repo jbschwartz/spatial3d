@@ -18,7 +18,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - uses: abatilo/actions-poetry@v2.1.4
     - run: poetry install
-    - run: poetry run pydocstyle ./spatial
-    - run: poetry run pylint ./spatial
+    - run: poetry run pydocstyle ./spatial3d
+    - run: poetry run pylint ./spatial3d
     - run: poetry run black --check .
     - run: python -m unittest

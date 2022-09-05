@@ -1,6 +1,6 @@
 import unittest
 
-from spatial import Intersection
+from spatial3d import Intersection
 
 
 class TestIntersection(unittest.TestCase):

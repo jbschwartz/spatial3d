@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from spatial.vector3 import (
+from spatial3d.vector3 import (
     Vector3,
     almost_equal,
     angle_between,

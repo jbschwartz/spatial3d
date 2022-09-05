@@ -1,8 +1,8 @@
 import math
 import unittest
 
-from spatial import Quaternion, Transform, Vector3, quaternion
-from spatial.euler import Axes, Order
+from spatial3d import Quaternion, Transform, Vector3, quaternion
+from spatial3d.euler import Axes, Order
 
 
 class TestQuaternion(unittest.TestCase):

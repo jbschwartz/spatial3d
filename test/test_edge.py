@@ -1,6 +1,6 @@
 import unittest
 
-from spatial import Edge, Vector3
+from spatial3d import Edge, Vector3
 
 
 class TestEdge(unittest.TestCase):

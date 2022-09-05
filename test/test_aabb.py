@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from spatial import AABB, CoordinateAxes, Ray, Vector3
+from spatial3d import AABB, CoordinateAxes, Ray, Vector3
 
 
 class TestAABB(unittest.TestCase):
