@@ -1,4 +1,4 @@
-# Spatial3d v0.6.3 ![Badge](https://github.com/jbschwartz/spatial/actions/workflows/ci.yml/badge.svg)
+# spatial3d v0.6.3 ![Badge](https://github.com/jbschwartz/spatial/actions/workflows/ci.yml/badge.svg)
 
 A Python library for representing and working with 3D objects.
 

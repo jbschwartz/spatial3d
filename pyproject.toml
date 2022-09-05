@@ -2,7 +2,21 @@
 name = "spatial3d"
 version = "0.6.3"
 description = "A Python library for representing and working with 3D objects."
-authors = ["James Schwartz"]
+authors = ["James Schwartz <james@schwartz.engineer>"]
+keywords = ["vector", "matrix", "quaternion", "mesh"]
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/jbschwartz/spatial3d"
+repository = "https://github.com/jbschwartz/spatial3d"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Natural Language :: English",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
