@@ -7,12 +7,11 @@ A Python library for representing and working with 3D objects.
 Install using `pip`:
 
 ```
-python -m pip install git+https://github.com/jbschwartz/spatial.git
+python -m pip install spatial3d
 ```
 
-Install using `poetry` (in the `pyproject.toml` file):
+Install using `poetry`:
 
 ```
-[tool.poetry.dependencies]
-spatial = { git = "https://github.com/jbschwartz/spatial.git" }
+poetry add spatial3d
 ```
