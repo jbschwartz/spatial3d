@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from spatial import Facet, Ray, Transform, Vector3, vector3
+from spatial3d import Facet, Ray, Transform, Vector3, vector3
 
 
 class TestRay(unittest.TestCase):

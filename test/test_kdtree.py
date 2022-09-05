@@ -1,6 +1,6 @@
 import unittest
 
-from spatial import AABB, CoordinateAxes, Facet, KDTreeNode, Ray, Vector3
+from spatial3d import AABB, CoordinateAxes, Facet, KDTreeNode, Ray, Vector3
 
 
 class TestKDTree(unittest.TestCase):

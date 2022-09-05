@@ -6,7 +6,7 @@ import enum
 import math
 from typing import List
 
-from spatial.vector3 import Vector3
+from spatial3d.vector3 import Vector3
 
 from ..parameters import parameters
 

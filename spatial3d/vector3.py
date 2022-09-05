@@ -1,7 +1,7 @@
 import math
 from typing import Optional, Union, overload
 
-from spatial import parameters
+from spatial3d import parameters
 
 from .parameters import parameters
 from .swizzler import Swizzler

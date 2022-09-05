@@ -1,6 +1,6 @@
 import unittest
 
-from spatial import CoordinateAxes, Vector3
+from spatial3d import CoordinateAxes, Vector3
 
 
 class TestSwizzler(unittest.TestCase):

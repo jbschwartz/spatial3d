@@ -3,8 +3,8 @@ import unittest
 from operator import itemgetter
 from typing import List
 
-from spatial import Quaternion, Vector3
-from spatial.euler import Axes, Order, angles
+from spatial3d import Quaternion, Vector3
+from spatial3d.euler import Axes, Order, angles
 
 
 def fix_angle_range(angle: float) -> float:
