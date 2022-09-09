@@ -2,6 +2,7 @@ import math
 import unittest
 
 from spatial3d import AABB, CoordinateAxes, Ray, Vector3
+from spatial3d.transform import Transform
 
 
 class TestAABB(unittest.TestCase):
@@ -137,3 +138,18 @@ class TestAABB(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             self.aabb.split(CoordinateAxes.X, value)
+
+    def test_transform_returns_the_AABB_of_the_transformed_AABB(self) -> None:
+        aabb = AABB([Vector3(1, 1, 1), Vector3(-1, -1, -1)])
+
+        transform = Transform.from_axis_angle_translation(Vector3.Z(), math.radians(90))
+        transformed = aabb.transform(transform)
+
+        self.assertAlmostEqual(transformed.min, aabb.min)
+        self.assertAlmostEqual(transformed.max, aabb.max)
+
+        transform = Transform.from_axis_angle_translation(Vector3.Z(), math.radians(45))
+        transformed = aabb.transform(transform)
+
+        self.assertAlmostEqual(transformed.min, Vector3(-math.sqrt(2), -math.sqrt(2), -1))
+        self.assertAlmostEqual(transformed.max, Vector3(math.sqrt(2), math.sqrt(2), 1))

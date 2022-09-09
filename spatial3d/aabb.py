@@ -3,6 +3,7 @@ from functools import cached_property
 from typing import Iterable, List, Optional, Tuple, Union
 
 from .coordinate_axes import CoordinateAxes
+from .transform import Transform
 from .vector3 import Vector3
 
 Boundable = Union[Vector3, "AABB", Iterable[Vector3], Iterable["AABB"]]
@@ -148,3 +149,7 @@ class AABB:
         right = AABB([right_min, self.max])
 
         return left, right
+
+    def transform(self, transform: Transform) -> "AAAB":
+        """Return an AABB transformed with the provided transform."""
+        return AABB(transform(self.corners, as_type="point"))
