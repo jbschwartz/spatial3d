@@ -7,10 +7,6 @@ class Intersection(namedtuple("Intersection", "t obj")):
 
     __slots__ = ()
 
-    # TODO: It may be necessary to include the chain of intersections that occur to the caller.
-    # e.g. Facet -> Mesh -> Link -> Serial
-    # This could maybe be implemented with a `previous` attribute on the tuple
-    # i.e. __new__(..., previous: 'Intersection')
     def __new__(cls, t: Optional[float], obj: Optional[Any]):
         """Construct a new intersection given a parametric location and the intersected object."""
         if t is not None and t < 0:
