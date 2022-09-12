@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "spatial3d"
-version = "0.7.0"
+version = "0.7.1"
 description = "A Python library for representing and working with 3D objects."
 authors = ["James Schwartz <james@schwartz.engineer>"]
 keywords = ["vector", "matrix", "quaternion", "mesh"]
