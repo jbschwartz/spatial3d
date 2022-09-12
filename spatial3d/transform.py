@@ -63,11 +63,7 @@ class Transform:
     @property
     def basis(self) -> Tuple[Vector3, Vector3, Vector3]:
         """Return orthonormal basis vectors for the given transformation."""
-        return (
-            self.transform(Vector3.X(), as_type="vector"),
-            self.transform(Vector3.Y(), as_type="vector"),
-            self.transform(Vector3.Z(), as_type="vector"),
-        )
+        return (self.x_axis, self.y_axis, self.z_axis)
 
     @property
     def rotation(self) -> Quaternion:
@@ -80,6 +76,33 @@ class Transform:
         # "Undo" what was done in the __init__ function by working backwards
         t = 2 * self.dual.d * quaternion.conjugate(self.dual.r)
         return t.vector
+
+    @property
+    def x_axis(self) -> Vector3:
+        """Return the image of the X axis of under the given transformation.
+
+        If the transformation is interpreted as a coordinate frame, this is the X axis of the
+        transformed coordinate frame.
+        """
+        return self.transform(Vector3.X(), as_type="vector")
+
+    @property
+    def y_axis(self) -> Vector3:
+        """Return the image of the Y axis of under the given transformation.
+
+        If the transformation is interpreted as a coordinate frame, this is the Y axis of the
+        transformed coordinate frame.
+        """
+        return self.transform(Vector3.Y(), as_type="vector")
+
+    @property
+    def z_axis(self) -> Vector3:
+        """Return the image of the Z axis of under the given transformation.
+
+        If the transformation is interpreted as a coordinate frame, this is the Z axis of the
+        transformed coordinate frame.
+        """
+        return self.transform(Vector3.Z(), as_type="vector")
 
     def inverse(self) -> "Transform":
         """Return a the inverse of this transform."""

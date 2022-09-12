@@ -70,7 +70,7 @@ class TestTransform(unittest.TestCase):
     def test__mul__returns_notimplemented_for_incompatible_types(self) -> None:
         self.assertTrue(self.both.__mul__("string") == NotImplemented)
 
-    def test_basis_returns_the_transformations_basis_vectors(self) -> None:
+    def test_basis_and_axis_properties_return_the_transformations_basis_vectors(self) -> None:
         quaternion = Quaternion.from_euler(
             [math.radians(45), math.radians(-45), 0], Axes.XYX, Order.INTRINSIC
         )
@@ -82,6 +82,10 @@ class TestTransform(unittest.TestCase):
         self.assertAlmostEqual(Vector3(a, -0.5, 0.5), basis[0])
         self.assertAlmostEqual(Vector3(0, a, a), basis[1])
         self.assertAlmostEqual(Vector3(-a, -0.5, 0.5), basis[2])
+
+        self.assertAlmostEqual(transform.x_axis, basis[0])
+        self.assertAlmostEqual(transform.y_axis, basis[1])
+        self.assertAlmostEqual(transform.z_axis, basis[2])
 
     def test_rotation_returns_the_rotation_component_of_the_transform(self) -> None:
         self.assertEqual(self.pureRotate.rotation, self.pureRotate.dual.r)
