@@ -15,19 +15,18 @@ classifiers = [
     "Operating System :: OS Independent",
     "Natural Language :: English",
     "Topic :: Scientific/Engineering",
-    "Topic :: Scientific/Engineering :: Mathematics"
+    "Topic :: Scientific/Engineering :: Mathematics",
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8"
 
-[tool.poetry.dev-dependencies]
-black = "^22.6.0"
-mypy = "^0.971"
-pydocstyle = "^6.1.1"
-pylint = "^2.14.5"
-coverage = "^6.4.3"
-sympy = "^1.10.1"
+[tool.poetry.group.dev.dependencies]
+black = "^24.2.0"
+pydocstyle = "^6.3.0"
+pylint = "^3.0.3"
+coverage = "^7.4.1"
+mypy = "^1.8.0"
 toml = "^0.10.2"
 
 [build-system]
@@ -41,7 +40,7 @@ line-length = 100
 profile = "black"
 
 [tool.pydocstyle]
-match='(?!test_).*\.py'
+match = '(?!test_).*\.py'
 # Turn off module (D100) and __init__ (D107) docstrings.
 # Ignore blank line before class docstring (D203) and docstrings start on the first line (D213).
 ignore = "D100, D107, D213, D203"
@@ -53,6 +52,4 @@ disable = "C0103, C0114, W0511"
 [tool.coverage]
 run.omit = ["*/test_*.py"]
 report.precision = 2
-report.exclude_lines = [
-    "@overload",
-]
+report.exclude_lines = ["@overload"]
