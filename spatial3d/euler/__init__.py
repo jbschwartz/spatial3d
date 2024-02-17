@@ -1,4 +1,5 @@
 """Euler Angles library."""
+
 from typing import List
 
 from .axes import Axes

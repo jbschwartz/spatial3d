@@ -33,7 +33,7 @@ class KDTreeNode:
         # Create a node for the left and right after splitting.
         nodes = zip(self.aabb.split(*splitting_plane), self.split_facets(*splitting_plane))
 
-        for (aabb, facets) in nodes:
+        for aabb, facets in nodes:
             node = KDTreeNode(aabb, facets)
             node.branch(depth + 1)
 
